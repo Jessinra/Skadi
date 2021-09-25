@@ -38,3 +38,12 @@ aws cloudformation create-stack \
 --template-body file://script/cloudformation/network.yml  \
 --parameters file://script/cloudformation/network-dev-param.json \
 --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM"
+
+## Elastic Beanstalk Cloud Formation
+
+There are 2 prerequisite that need to be done before you can create new environment using cloudformation, mainly:
+- `aws-elasticbeanstalk-ec2-role`  
+- `aws-elasticbeanstalk-service-role` 
+
+Both are created automatically when you create a new environment using the console for the first time.
+Try to create a dummy environment & application first before running the EB cloudformation script.

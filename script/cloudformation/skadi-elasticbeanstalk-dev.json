@@ -1,0 +1,42 @@
+[
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "trivery-dev"
+  },
+  {
+    "ParameterKey": "EBAppName",
+    "ParameterValue": "skadi"
+  },
+  {
+    "ParameterKey": "EBAppDescription",
+    "ParameterValue": "Main backend service for Trivery"
+  },
+  {
+    "ParameterKey": "EBEnvName",
+    "ParameterValue": "skadi-dev"
+  },
+  {
+    "ParameterKey": "EBEnvDescription",
+    "ParameterValue": "skadi development environment"
+  },
+  {
+    "ParameterKey": "VPC",
+    "ParameterValue": "vpc-06b5dbe99a7bee484"
+  },
+  {
+    "ParameterKey": "PrivateSubnet1",
+    "ParameterValue": "subnet-02272e4b8d4b2672c"
+  },
+  {
+    "ParameterKey": "PrivateSubnet2",
+    "ParameterValue": "subnet-00fa0236f4e2fc473"
+  },
+  {
+    "ParameterKey": "EC2InstanceTypes",
+    "ParameterValue": "t3.micro"
+  },
+  {
+    "ParameterKey": "EC2KeyPairName",
+    "ParameterValue": "skadi-dev"
+  }
+]

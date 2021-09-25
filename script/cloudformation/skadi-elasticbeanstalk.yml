@@ -1,0 +1,180 @@
+Description: >
+    Deploy an ElasticBeanstalk Environment for Backend Application (Skadi)
+
+Parameters:
+    ProjectName:
+        Description: A name that will be prefixed to resource names
+        Type: String
+        
+    EBAppName:
+        Type: String
+
+    EBAppDescription:
+        Type: String
+
+    EBEnvName:
+        Description: Name of the ElasticBeanstalk Environment
+        Type: String
+
+    EBEnvDescription:
+        Type: String
+    
+    VPC:
+        Type: String
+
+    PrivateSubnet1:
+        Type: String
+
+    PrivateSubnet2:
+        Type: String
+
+    EC2InstanceTypes:
+        Description: Comma separated instance types (e.g. t2.micro,t2.small) for autoscaling launch configuration
+        Type: String
+    
+    EC2KeyPairName:
+        Description: Name of the EC2 Key Pair used for ssh
+        Type: String
+
+Resources:
+    # EBApplication:
+    #     Type: AWS::ElasticBeanstalk::Application
+    #     Properties: 
+    #         ApplicationName: !Ref EBAppName
+    #         Description: !Ref EBAppDescription
+    
+    EBEnvironment: 
+        Type: AWS::ElasticBeanstalk::Environment
+        Properties: 
+            ApplicationName: !Ref EBAppName
+            EnvironmentName: !Ref EBEnvName
+            Description: !Ref EBEnvDescription
+            OptionSettings: # https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
+              # Required options (can't be omitted)
+              - Namespace: aws:autoscaling:launchconfiguration
+                OptionName: IamInstanceProfile
+                Value: aws-elasticbeanstalk-ec2-role
+              - Namespace: aws:elasticbeanstalk:environment
+                OptionName: ServiceRole
+                Value: aws-elasticbeanstalk-service-role
+
+              # Capacity
+              - Namespace: aws:autoscaling:asg
+                OptionName: MinSize
+                Value: 1
+              - Namespace: aws:autoscaling:asg
+                OptionName: MaxSize
+                Value: 2
+
+              # EC2
+              - Namespace: aws:autoscaling:launchconfiguration
+                OptionName: ImageId
+                Value: ami-09afd7870fbd99d0b # default value from AWS console when you create an EB environment > capacity
+              - Namespace: aws:autoscaling:launchconfiguration
+                OptionName: MonitoringInterval
+                Value: 1 minute
+              - Namespace: aws:ec2:instances
+                OptionName: InstanceTypes
+                Value: !Ref EC2InstanceTypes
+              - Namespace: aws:autoscaling:launchconfiguration
+                OptionName: EC2KeyName
+                Value: !Ref EC2KeyPairName
+            
+              # Environment
+              - Namespace: aws:elasticbeanstalk:environment
+                OptionName: EnvironmentType
+                Value: LoadBalanced
+              - Namespace: aws:elasticbeanstalk:environment
+                OptionName: LoadBalancerType
+                Value: application
+
+              # Auto scale triggers
+              - Namespace: aws:autoscaling:trigger
+                OptionName: MeasureName
+                Value: CPUUtilization
+              - Namespace: aws:autoscaling:trigger
+                OptionName: Statistic
+                Value: Average
+              - Namespace: aws:autoscaling:trigger
+                OptionName: Unit
+                Value: Percent
+              - Namespace: aws:autoscaling:trigger
+                OptionName: LowerThreshold
+                Value: 20
+              - Namespace: aws:autoscaling:trigger
+                OptionName: UpperThreshold
+                Value: 70
+              
+              # Deployment & Rolling Update
+              - Namespace: aws:elasticbeanstalk:command
+                OptionName: DeploymentPolicy
+                Value: Rolling
+              - Namespace: aws:elasticbeanstalk:command
+                OptionName: BatchSizeType
+                Value: Percentage
+              - Namespace: aws:elasticbeanstalk:command
+                OptionName: BatchSize
+                Value: 50
+              - Namespace: aws:autoscaling:updatepolicy:rollingupdate
+                OptionName: RollingUpdateEnabled
+                Value: true
+              - Namespace: aws:autoscaling:updatepolicy:rollingupdate
+                OptionName: RollingUpdateType
+                Value: Health
+
+              # Logs
+              - Namespace: aws:elasticbeanstalk:cloudwatch:logs
+                OptionName: StreamLogs
+                Value: true
+              - Namespace: aws:elasticbeanstalk:cloudwatch:logs
+                OptionName: RetentionInDays
+                Value: 30
+              
+              # Health reporting
+              - Namespace: aws:elasticbeanstalk:cloudwatch:logs:health
+                OptionName: HealthStreamingEnabled
+                Value: true
+              - Namespace: aws:elasticbeanstalk:cloudwatch:logs:health
+                OptionName: RetentionInDays
+                Value: 30
+              - Namespace: aws:elasticbeanstalk:healthreporting:system
+                OptionName: SystemType
+                Value: enhanced
+
+              # Network
+              - Namespace: aws:ec2:vpc
+                OptionName: VPCId
+                Value: !Ref VPC
+              - Namespace: aws:ec2:vpc
+                OptionName: ELBScheme
+                Value: internal
+              - Namespace: aws:ec2:vpc
+                OptionName: ELBSubnets
+                Value: !Join
+                  - ','
+                  - - !Ref PrivateSubnet1
+                    - !Ref PrivateSubnet2
+              - Namespace: aws:ec2:vpc
+                OptionName: AssociatePublicIpAddress
+                Value: false
+              - Namespace: aws:ec2:vpc
+                OptionName: Subnets
+                Value: !Join
+                  - ','
+                  - - !Ref PrivateSubnet1
+                    - !Ref PrivateSubnet2
+
+            SolutionStackName: 64bit Amazon Linux 2 v3.4.0 running Go 1
+            Tags: 
+              - Key: Name
+                Value: !Sub "${EBEnvName}"
+            Tier: 
+                Name: WebServer
+                Type: Standard
+
+Outputs:
+    ALBEndpoint:
+        Description: created application load balancer endpoint
+        Value: !GetAtt EBEnvironment.EndpointURL
+        Export:
+            Name: !Sub ${EBEnvName}-Endpoint
