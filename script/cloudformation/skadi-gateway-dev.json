@@ -1,0 +1,42 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "skadi-dev"
+  },
+  {
+    "ParameterKey": "GatewayName",
+    "ParameterValue": "skadi-dev-gateway"
+  },
+  {
+    "ParameterKey": "GatewayDescription",
+    "ParameterValue": "API gateway for skadi-dev, created with CloudFormation"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "dev.trivery.id"
+  },
+  {
+    "ParameterKey": "DomainNameCertificate",
+    "ParameterValue": "arn:aws:acm:ap-southeast-1:442662599070:certificate/d66c9145-f12b-4c80-b0ff-b0f87117074e"
+  },
+  {
+    "ParameterKey": "VPCLinkName",
+    "ParameterValue": "skadi-dev-VPCLink"
+  },
+  {
+    "ParameterKey": "VPCLinkSecurityGroup",
+    "ParameterValue": "sg-054274cf8e545fcea"
+  },
+  {
+    "ParameterKey": "VPCLinkPrivateSubnet1",
+    "ParameterValue": "subnet-02272e4b8d4b2672c"
+  },
+  {
+    "ParameterKey": "VPCLinkPrivateSubnet2",
+    "ParameterValue": "subnet-00fa0236f4e2fc473"
+  },
+  {
+    "ParameterKey": "IntegrationAppLoadBalancerListener",
+    "ParameterValue": "arn:aws:elasticloadbalancing:ap-southeast-1:442662599070:listener/app/awseb-AWSEB-9QGDK45KQ7VW/a601a7bf56c9cd14/9cafa4d582247bba"
+  }
+]

@@ -1,0 +1,125 @@
+Description: >
+    Deploy a HTTP API Gateway, proxy route, and connect to resource using VPC Link
+
+Parameters:
+    Environment:
+        Description: A name that will be prefixed to resource names
+        Type: String
+
+    GatewayName: 
+        Type: String
+
+    GatewayDescription:
+        Type: String
+
+    DomainName:
+        Type: String
+    
+    DomainNameCertificate:
+        Description: An AWS-managed certificate that will be used by the edge-optimized endpoint for this domain name.
+        Type: String
+
+    VPCLinkName:
+        Type: String
+    
+    VPCLinkSecurityGroup:
+        Type: String
+
+    VPCLinkPrivateSubnet1:
+        Type: String
+    
+    VPCLinkPrivateSubnet2:
+        Type: String
+
+    IntegrationAppLoadBalancerListener:
+        Description: ARN of a Application-LoadBalancer's Listener used for route integration
+        Type: String
+
+
+Resources:
+    APIGateway: 
+        Type: AWS::ApiGatewayV2::Api
+        Properties: 
+            Name: !Ref GatewayName
+            Description: !Ref GatewayDescription
+            ProtocolType: HTTP
+            Tags: 
+                Name: !Sub "${Environment}-APIGateway"
+
+    CustomDomain:
+        Type: AWS::ApiGatewayV2::DomainName
+        Properties: 
+            DomainName: !Ref DomainName
+            DomainNameConfigurations: 
+              - CertificateArn: !Ref DomainNameCertificate
+                EndpointType: Regional
+                SecurityPolicy: TLS_1_2
+            Tags: 
+                Name: !Sub "${Environment}-APIGateway"
+    
+    APIMapping:
+        Type: AWS::ApiGatewayV2::ApiMapping
+        DependsOn: CustomDomain
+        Properties: 
+            ApiId: !Ref APIGateway
+            DomainName: !Ref DomainName
+            Stage: !Ref DefaultStage
+
+    LogGroup: 
+        Type: AWS::Logs::LogGroup
+        Properties: 
+            LogGroupName: !Sub /aws/api-gateway/${GatewayName}
+            RetentionInDays: 30
+
+    DefaultStage:
+        Type: AWS::ApiGatewayV2::Stage
+        Properties: 
+            AccessLogSettings: 
+                DestinationArn: !GetAtt LogGroup.Arn
+                Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+            ApiId: !Ref APIGateway
+            AutoDeploy: true
+            DefaultRouteSettings: 
+                DetailedMetricsEnabled: true
+            StageName: $default
+    
+    VPCLink:
+        Type: AWS::ApiGatewayV2::VpcLink
+        Properties: 
+            Name: !Ref VPCLinkName
+            SecurityGroupIds: 
+              - !Ref VPCLinkSecurityGroup
+            SubnetIds: 
+              - !Ref VPCLinkPrivateSubnet1
+              - !Ref VPCLinkPrivateSubnet2
+            Tags: 
+                Name: !Sub "${Environment}-VPCLink"
+
+    DefaultPrivateIntegration:
+        Type: AWS::ApiGatewayV2::Integration
+        Properties: 
+            Description: Default private integration to an AppLoadBalancer using VPCLink 
+            ApiId: !Ref APIGateway
+            ConnectionId: !Ref VPCLink
+            ConnectionType: VPC_LINK
+            IntegrationMethod: ANY
+            IntegrationType: HTTP_PROXY # For HTTP API private integrations, use an HTTP_PROXY integration.
+            IntegrationUri: !Ref IntegrationAppLoadBalancerListener
+            PayloadFormatVersion: "1.0"
+        
+    # ================== Routes ==================
+    DefaultRoute:
+        Type: AWS::ApiGatewayV2::Route
+        Properties: 
+            ApiId: !Ref APIGateway
+            RouteKey: ANY /{proxy+}
+            Target: !Sub "integrations/${DefaultPrivateIntegration}"
+
+Outputs:
+    APIGatewayEndpoint:
+        Description: created API Gateway endpoint
+        Value: !GetAtt APIGateway.ApiEndpoint
+
+    CustomDomainRegional:
+        Description: The domain name associated with the regional endpoint for this custom domain name
+        Value: !GetAtt CustomDomain.RegionalDomainName
