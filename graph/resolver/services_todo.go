@@ -4,7 +4,7 @@ import (
 	"gitlab.com/trivery-id/skadi/internal/todo/services"
 )
 
-var TodoService *services.TodoService
+var TodoService *services.TodoService = &services.TodoService{}
 
 // var TodoService ITodoService
 

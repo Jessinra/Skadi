@@ -24,6 +24,14 @@
     "ParameterValue": "vpc-06b5dbe99a7bee484"
   },
   {
+    "ParameterKey": "PublicSubnet1",
+    "ParameterValue": "subnet-0b450a9b4426de827"
+  },
+  {
+    "ParameterKey": "PublicSubnet2",
+    "ParameterValue": "subnet-03f56858191e9fab9"
+  },
+  {
     "ParameterKey": "PrivateSubnet1",
     "ParameterValue": "subnet-02272e4b8d4b2672c"
   },
