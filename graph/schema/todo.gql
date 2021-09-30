@@ -4,7 +4,13 @@ type Todo {
   id: ID!
   createdAt: Time!
   text: String!
-  description: String!
+  description: String
   done: Boolean!
+  userID: ID!
+}
+
+input CreateTodo {
+  text: String!
+  description: String
   userID: ID!
 }

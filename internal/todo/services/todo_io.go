@@ -1,6 +1,7 @@
 package services
 
 type CreateNewTodoInput struct {
-	Text   string
-	UserID uint64
+	Text        string
+	Description *string
+	UserID      uint64
 }

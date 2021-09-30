@@ -3,5 +3,5 @@
 # https://gqlgen.com/getting-started/
 
 type Query {
-	todos: [Todo!]!
+	getTodos(userID: ID): [Todo!]!
 }

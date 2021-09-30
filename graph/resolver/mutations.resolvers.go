@@ -11,25 +11,17 @@ import (
 	"gitlab.com/trivery-id/skadi/internal/todo/services"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateNewTodoInput) (*model.Todo, error) {
+func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error) {
 	todo, err := TodoService.CreateNewTodo(ctx, services.CreateNewTodoInput{
-		Text:   input.Text,
-		UserID: input.UserID,
+		Text:        input.Text,
+		Description: input.Description,
+		UserID:      input.UserID,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return model.NewTodo(todo), nil
-}
-
-func (r *mutationResolver) GetAllTodos(ctx context.Context, userID uint64) ([]model.Todo, error) {
-	todos, err := TodoService.GetAllTodos(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return model.NewTodos(todos), err
 }
 
 // Mutation returns generated.MutationResolver implementation.

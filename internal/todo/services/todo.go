@@ -2,6 +2,8 @@ package services
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"gitlab.com/trivery-id/skadi/internal/todo/domain"
 )
@@ -16,8 +18,11 @@ var Service = &TodoService{
 
 func (svc *TodoService) CreateNewTodo(ctx context.Context, in CreateNewTodoInput) (*domain.Todo, error) {
 	todo := domain.Todo{
-		Text:   in.Text,
-		UserID: in.UserID,
+		ID:          uint64(rand.Int()),
+		CreatedAt:   time.Now(),
+		Text:        in.Text,
+		UserID:      in.UserID,
+		Description: in.Description,
 	}
 
 	svc.todos = append(svc.todos, todo)

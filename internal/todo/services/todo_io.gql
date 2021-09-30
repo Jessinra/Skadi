@@ -1,5 +1,0 @@
-
-input CreateNewTodoInput {
-  text: String!
-  userID: ID!
-}

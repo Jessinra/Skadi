@@ -5,6 +5,5 @@
 # import TodoMutation from "../../internal/todo/services"
 
 type Mutation {
-    createTodo(input: CreateNewTodoInput!): Todo!
-	getAllTodos(userID: ID!): [Todo!]!
+    createTodo(input: CreateTodo!): Todo!
 }

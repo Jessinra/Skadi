@@ -6,16 +6,17 @@ import (
 	"time"
 )
 
-type CreateNewTodoInput struct {
-	Text   string `json:"text"`
-	UserID uint64 `json:"userID"`
+type CreateTodo struct {
+	Text        string  `json:"text"`
+	Description *string `json:"description"`
+	UserID      uint64  `json:"userID"`
 }
 
 type Todo struct {
 	ID          uint64    `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`
 	Text        string    `json:"text"`
-	Description string    `json:"description"`
+	Description *string   `json:"description"`
 	Done        bool      `json:"done"`
 	UserID      uint64    `json:"userID"`
 }
