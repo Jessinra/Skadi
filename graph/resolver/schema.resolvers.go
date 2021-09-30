@@ -5,24 +5,17 @@ package resolver
 
 import (
 	"context"
-	"math/rand"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
-		Text:   input.Text,
-		ID:     rand.Uint64(),
-		UserID: input.UserID, // fix this line
-	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+	return nil, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+	return nil, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
