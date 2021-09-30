@@ -1,4 +1,4 @@
-package graph
+package resolver
 
 import "gitlab.com/trivery-id/skadi/graph/model"
 
