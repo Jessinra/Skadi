@@ -1,3 +1,5 @@
+//go:generate go run github.com/99designs/gqlgen
+
 package resolver
 
 import "gitlab.com/trivery-id/skadi/graph/model"

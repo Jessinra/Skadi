@@ -4,7 +4,14 @@ package model
 
 type NewTodo struct {
 	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	UserID uint64 `json:"userID"`
+}
+
+type Todo struct {
+	ID     uint64 `json:"id"`
+	Text   string `json:"text"`
+	Done   bool   `json:"done"`
+	UserID uint64 `json:"userID"`
 }
 
 type User struct {
