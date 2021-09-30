@@ -14,6 +14,10 @@ type Todo struct {
 	UserID uint64 `json:"userID"`
 }
 
+type TodoMutation struct {
+	Create *Todo `json:"create"`
+}
+
 type User struct {
 	ID   uint64 `json:"id"`
 	Name string `json:"name"`

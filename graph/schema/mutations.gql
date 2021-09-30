@@ -1,0 +1,9 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+# import TodoMutation from "../../internal/todo/services"
+
+type Mutation {
+  todoMutation: TodoMutation
+}

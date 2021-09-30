@@ -1,0 +1,4 @@
+
+type TodoMutation {
+  create(input: NewTodo!): Todo!
+}
