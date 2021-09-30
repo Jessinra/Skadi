@@ -10,7 +10,7 @@ import (
 	"gitlab.com/trivery-id/skadi/graph/model"
 )
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *queryResolver) Todos(ctx context.Context) ([]model.Todo, error) {
 	return nil, nil
 }
 

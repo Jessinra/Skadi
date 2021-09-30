@@ -1,12 +1,10 @@
+scalar Time
 
 type Todo {
   id: ID!
+  createdAt: Time!
   text: String!
+  description: String!
   done: Boolean!
-  userID: ID!
-}
-
-input NewTodo {
-  text: String!
   userID: ID!
 }
