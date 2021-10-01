@@ -111,7 +111,6 @@ deploy-dev:
           aws elasticbeanstalk create-application-version 
           --application-name $EB_APP_NAME 
           --version-label $VERSION 
-          --description="Parnassus $VERSION" 
           --source-bundle S3Bucket=$S3_BUCKET,S3Key=$ARTIFACT_NAME 
           --auto-create-application 
           --region=$REGION 

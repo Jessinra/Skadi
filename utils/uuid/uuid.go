@@ -1,18 +1,19 @@
 package uuid
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
-	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/logger"
+	"go.uber.org/zap"
 )
 
-func NewUUID() (_ string, err error) {
+func NewUUID() string {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.NewInternalServerError(fmt.Sprintf("%v", r))
+			logger.Warn("failed to generate UUID",
+				zap.String("function", "uuid.NewUUID"),
+			)
 		}
 	}()
 
-	return uuid.New().String(), nil
+	return uuid.New().String()
 }

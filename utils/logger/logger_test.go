@@ -45,32 +45,14 @@ func TestLoggerWithCtx(t *testing.T) {
 	logger.SetDefaultContextParser(metadata.LoggerContextparser{})
 
 	t.Run("log using logger with ctx (user metadata) and added other additional context", func(t *testing.T) {
-		userMetadata := metadata.UserMetadata{
-			ID:       9342,
-			ClientID: 2131,
+		userMetadata := metadata.User{
+			ID:    9342,
+			Name:  "John Doe",
+			Email: "johndoe@gmail.com",
 		}
 
 		ctxWithUser := metadata.NewContextFromUser(context.Background(), userMetadata)
 		log := logger.GetLoggerWithCtx(ctxWithUser).With(
-			zap.String("string", "STRING"),
-			zap.Int("int", 123),
-			zap.Float64("float", 3.14),
-		)
-
-		assert.NotPanics(t, func() {
-			log.Info("test log info with context")
-			log.Warn("test log warn with context")
-			log.Error("test log error with context")
-		})
-	})
-
-	t.Run("log using logger with ctx (api key metadata) and added other additional context", func(t *testing.T) {
-		apiKeyMetadata := metadata.APIKeyMetadata{
-			Key: "ablksjdlfkajsldfkaablksjdlfkajsldfkajslkjjslkj",
-		}
-
-		ctxWithAPIKey := metadata.NewContextFromAPIKey(context.Background(), apiKeyMetadata)
-		log := logger.GetLoggerWithCtx(ctxWithAPIKey).With(
 			zap.String("string", "STRING"),
 			zap.Int("int", 123),
 			zap.Float64("float", 3.14),
