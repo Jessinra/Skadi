@@ -134,7 +134,7 @@ Resources:
                 Value: true
               - Namespace: aws:elasticbeanstalk:cloudwatch:logs
                 OptionName: RetentionInDays
-                Value: 30
+                Value: 7
               
               # Health reporting
               - Namespace: aws:elasticbeanstalk:cloudwatch:logs:health
@@ -142,7 +142,7 @@ Resources:
                 Value: true
               - Namespace: aws:elasticbeanstalk:cloudwatch:logs:health
                 OptionName: RetentionInDays
-                Value: 30
+                Value: 7
               - Namespace: aws:elasticbeanstalk:healthreporting:system
                 OptionName: SystemType
                 Value: enhanced
@@ -153,22 +153,22 @@ Resources:
                 Value: !Ref VPC
               - Namespace: aws:ec2:vpc
                 OptionName: ELBScheme
-                Value: internal
+                Value: public
               - Namespace: aws:ec2:vpc
                 OptionName: ELBSubnets
                 Value: !Join
                   - ','
-                  - - !Ref PrivateSubnet1
-                    - !Ref PrivateSubnet2
+                  - - !Ref PublicSubnet1
+                    - !Ref PublicSubnet2
               - Namespace: aws:ec2:vpc
                 OptionName: AssociatePublicIpAddress
-                Value: false
+                Value: true
               - Namespace: aws:ec2:vpc
                 OptionName: Subnets
                 Value: !Join
                   - ','
-                  - - !Ref PrivateSubnet1
-                    - !Ref PrivateSubnet2
+                  - - !Ref PublicSubnet1
+                    - !Ref PublicSubnet2
 
             SolutionStackName: 64bit Amazon Linux 2 v3.4.0 running Go 1
             Tags: 
