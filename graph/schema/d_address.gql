@@ -1,0 +1,20 @@
+
+type Address {
+    id: ID!
+    createdAt: Time!
+    deletedAt: Time
+
+    userID: ID!
+    title: String!
+    description: String
+
+    country: String!
+    province: String!
+    city: String!
+    area: String
+    street: String
+    building: String
+
+    longitude: Float
+    latitude: Float   
+}

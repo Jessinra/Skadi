@@ -1,0 +1,60 @@
+
+type Order {
+    id: ID!
+    createdAt: Time!
+    deletedAt: Time
+
+    requesterID: ID!
+    shopeerID: ID
+    productID: ID!
+
+    quantity: Int!
+    Notes: String
+
+    Deal: OrderDeal!
+    Pricing: OrderPricing!
+    State: OrderState!
+    Review: OrderReview
+}
+
+type OrderPricing {
+    orderID: ID!
+    currency: String!
+    price: Uint64!
+    priceEstimated: Uint64!
+    commission: Int!
+}
+
+type OrderState {
+    orderID: ID!
+    updatedAt: Time!
+    lastState: String!
+
+    timestampAccepted: Time
+    timestampPurchased: Time
+    timestampOnTheWay: Time
+    timestampDelivered: Time
+    timestampReviewed: Time
+    timestampCompleted: Time
+}
+
+type OrderDeal {
+    orderID: ID!
+    method: String!
+    location: Address!
+    time: Time!
+
+    includeBox: Boolean!
+}
+
+type OrderReview {
+    id: ID!
+    createdAt: Time!
+
+    orderID: ID!
+    requesterID: ID!
+    shopeerID: ID
+
+    stars: Int!
+    notes: String
+}

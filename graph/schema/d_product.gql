@@ -1,0 +1,40 @@
+
+type Product {
+    id: ID!
+    createdAt: Time!
+    deletedAt: Time
+
+    name: String!
+    description: String
+    imagesURLs: [String!]
+    locations: [ProductLocation!]  
+    price: Uint64!            
+    priceEstimated: Boolean!
+    weight: String
+    dimensions: String
+
+    countries: String!
+    categories: [String!]
+}
+
+type ProductLocation {
+    id: ID!
+    createdAt: Time!
+    deletedAt: Time
+
+    userID: ID!
+    productID: ID!
+    
+    text: String!
+
+    country: String!
+    province: String!
+    city: String!
+    area: String
+    street: String
+    building: String
+    store: String
+
+    longitude: Float
+    latitude: Float    
+}

@@ -1,0 +1,17 @@
+
+
+type User {
+    id: ID!
+    createdAt: Time!
+    deletedAt: Time
+
+    name: String!
+    email: String!
+    phoneNumber: String!
+    profilePictureURL: String!
+    currencyMain: String!
+    currencySub: String
+
+    defaultAddress: ID!
+    addresses: [Address!]
+}

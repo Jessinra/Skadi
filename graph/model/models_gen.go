@@ -6,10 +6,114 @@ import (
 	"time"
 )
 
+type Address struct {
+	ID          uint64     `json:"id"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	DeletedAt   *time.Time `json:"deletedAt"`
+	UserID      uint64     `json:"userID"`
+	Title       string     `json:"title"`
+	Description *string    `json:"description"`
+	Country     string     `json:"country"`
+	Province    string     `json:"province"`
+	City        string     `json:"city"`
+	Area        *string    `json:"area"`
+	Street      *string    `json:"street"`
+	Building    *string    `json:"building"`
+	Longitude   *float64   `json:"longitude"`
+	Latitude    *float64   `json:"latitude"`
+}
+
 type CreateTodo struct {
 	Text        string  `json:"text"`
 	Description *string `json:"description"`
 	UserID      uint64  `json:"userID"`
+}
+
+type Order struct {
+	ID          uint64        `json:"id"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	DeletedAt   *time.Time    `json:"deletedAt"`
+	RequesterID uint64        `json:"requesterID"`
+	ShopeerID   *uint64       `json:"shopeerID"`
+	ProductID   uint64        `json:"productID"`
+	Quantity    int           `json:"quantity"`
+	Notes       *string       `json:"Notes"`
+	Deal        *OrderDeal    `json:"Deal"`
+	Pricing     *OrderPricing `json:"Pricing"`
+	State       *OrderState   `json:"State"`
+	Review      *OrderReview  `json:"Review"`
+}
+
+type OrderDeal struct {
+	OrderID    uint64    `json:"orderID"`
+	Method     string    `json:"method"`
+	Location   *Address  `json:"location"`
+	Time       time.Time `json:"time"`
+	IncludeBox bool      `json:"includeBox"`
+}
+
+type OrderPricing struct {
+	OrderID        uint64 `json:"orderID"`
+	Currency       string `json:"currency"`
+	Price          uint64 `json:"price"`
+	PriceEstimated uint64 `json:"priceEstimated"`
+	Commission     int    `json:"commission"`
+}
+
+type OrderReview struct {
+	ID          uint64    `json:"id"`
+	CreatedAt   time.Time `json:"createdAt"`
+	OrderID     uint64    `json:"orderID"`
+	RequesterID uint64    `json:"requesterID"`
+	ShopeerID   *uint64   `json:"shopeerID"`
+	Stars       int       `json:"stars"`
+	Notes       *string   `json:"notes"`
+}
+
+type OrderState struct {
+	OrderID            uint64     `json:"orderID"`
+	UpdatedAt          time.Time  `json:"updatedAt"`
+	LastState          string     `json:"lastState"`
+	TimestampAccepted  *time.Time `json:"timestampAccepted"`
+	TimestampPurchased *time.Time `json:"timestampPurchased"`
+	TimestampOnTheWay  *time.Time `json:"timestampOnTheWay"`
+	TimestampDelivered *time.Time `json:"timestampDelivered"`
+	TimestampReviewed  *time.Time `json:"timestampReviewed"`
+	TimestampCompleted *time.Time `json:"timestampCompleted"`
+}
+
+type Product struct {
+	ID             uint64            `json:"id"`
+	CreatedAt      time.Time         `json:"createdAt"`
+	DeletedAt      *time.Time        `json:"deletedAt"`
+	Name           string            `json:"name"`
+	Description    *string           `json:"description"`
+	ImagesURLs     []string          `json:"imagesURLs"`
+	Locations      []ProductLocation `json:"locations"`
+	Price          uint64            `json:"price"`
+	PriceEstimated bool              `json:"priceEstimated"`
+	Weight         *string           `json:"weight"`
+	Dimensions     *string           `json:"dimensions"`
+	Countries      string            `json:"countries"`
+	Categories     []string          `json:"categories"`
+}
+
+type ProductLocation struct {
+	ID        uint64     `json:"id"`
+	CreatedAt time.Time  `json:"createdAt"`
+	DeletedAt *time.Time `json:"deletedAt"`
+	UserID    uint64     `json:"userID"`
+	ProductID uint64     `json:"productID"`
+	Text      string     `json:"text"`
+	Country   string     `json:"country"`
+	Province  string     `json:"province"`
+	City      string     `json:"city"`
+	Area      *string    `json:"area"`
+	Street    *string    `json:"street"`
+	Building  *string    `json:"building"`
+	Store     *string    `json:"store"`
+	Longitude *float64   `json:"longitude"`
+	Latitude  *float64   `json:"latitude"`
 }
 
 type Todo struct {
@@ -22,6 +126,15 @@ type Todo struct {
 }
 
 type User struct {
-	ID   uint64 `json:"id"`
-	Name string `json:"name"`
+	ID                uint64     `json:"id"`
+	CreatedAt         time.Time  `json:"createdAt"`
+	DeletedAt         *time.Time `json:"deletedAt"`
+	Name              string     `json:"name"`
+	Email             string     `json:"email"`
+	PhoneNumber       string     `json:"phoneNumber"`
+	ProfilePictureURL string     `json:"profilePictureURL"`
+	CurrencyMain      string     `json:"currencyMain"`
+	CurrencySub       *string    `json:"currencySub"`
+	DefaultAddress    uint64     `json:"defaultAddress"`
+	Addresses         []Address  `json:"addresses"`
 }
