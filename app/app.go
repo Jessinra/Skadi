@@ -9,19 +9,34 @@ import (
 	skadipsql "gitlab.com/trivery-id/skadi/datasources/postgres/skadi"
 	"gitlab.com/trivery-id/skadi/external/db/postgres"
 	"gitlab.com/trivery-id/skadi/external/secret-manager/aws"
+	"gitlab.com/trivery-id/skadi/graph/resolver"
+	userServices "gitlab.com/trivery-id/skadi/internal/user/services"
 	"gitlab.com/trivery-id/skadi/utils/logger"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
 var router = gin.Default()
 
 func StartApplication() {
+	initLogger()
 	initRoutes()
 	initSkadiDatabase()
+
+	initServices()
+	initServiceDependencies()
+	validateServices()
+
+	resolver.InitResolvers()
 
 	logger.Info("about to start the application...")
 	if err := router.Run(":5000"); err != nil {
 		panic(err.Error())
 	}
+}
+
+func initLogger() {
+	logger.InitLogger()
+	logger.SetDefaultContextParser(metadata.LoggerContextparser{})
 }
 
 func initSkadiDatabase() {
@@ -59,6 +74,30 @@ func initSkadiDatabase() {
 	}
 
 	logger.Info("skadi database initialized successfully!")
+}
+
+func initServices() {
+	// sorted alphabetically
+
+	if err := userServices.InitServices(); err != nil {
+		logger.Error("Failed to initialize user services", err)
+		panic(fmt.Sprintf("Failed to initialize user services: `%+v`", err))
+	}
+}
+
+func initServiceDependencies() {
+	// sorted alphabetically
+
+	userServices.InitServiceDependencies()
+}
+
+func validateServices() {
+	// sorted alphabetically
+
+	if err := userServices.ValidateServices(); err != nil {
+		logger.Error("Invalid userServices initialization", err)
+		panic(fmt.Sprintf("Invalid userServices initialization: `%+v`", err))
+	}
 }
 
 func getAPPSecretName() string {

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	testSecretID = "parnassus-test" // nolint gosec potential hardcoded credentials
+	testSecretID = "skadi-test" // nolint gosec potential hardcoded credentials
 	testRegion   = "ap-southeast-1"
 )
 

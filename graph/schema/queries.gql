@@ -3,5 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 type Query {
+	user(id: ID!): User!
+
 	getTodos(userID: ID): [Todo!]!
 }
