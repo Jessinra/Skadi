@@ -153,7 +153,7 @@ Resources:
                 Value: !Ref VPC
               - Namespace: aws:ec2:vpc
                 OptionName: ELBScheme
-                Value: internal
+                Value: public
               - Namespace: aws:ec2:vpc
                 OptionName: ELBSubnets
                 Value: !Join
