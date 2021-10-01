@@ -11,12 +11,21 @@ import (
 	"gitlab.com/trivery-id/skadi/graph/model"
 )
 
+func (r *queryResolver) User(ctx context.Context, id uint64) (*model.User, error) {
+	user, err := userService.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewUser(user), nil
+}
+
 func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {
 	if userID == nil {
 		return nil, errors.New("userID is required")
 	}
 
-	todos, err := TodoService.GetAllTodos(ctx, *userID)
+	todos, err := todoService.GetAllTodos(ctx, *userID)
 	if err != nil {
 		return nil, err
 	}

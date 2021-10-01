@@ -5,5 +5,9 @@
 # import TodoMutation from "../../internal/todo/services"
 
 type Mutation {
+    registerUser(input: RegisterUser!): User!
+    updateUser(input: UpdateUser!): User!
+    updateUserPassword(input: UpdateUserPassword!): Boolean!
+
     createTodo(input: CreateTodo!): Todo!
 }

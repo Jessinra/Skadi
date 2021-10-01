@@ -116,6 +116,12 @@ type ProductLocation struct {
 	Latitude  *float64   `json:"latitude"`
 }
 
+type RegisterUser struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Todo struct {
 	ID          uint64    `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`
@@ -125,16 +131,29 @@ type Todo struct {
 	UserID      uint64    `json:"userID"`
 }
 
+type UpdateUser struct {
+	ID                uint64  `json:"id"`
+	Name              *string `json:"name"`
+	PhoneNumber       *string `json:"phoneNumber"`
+	ProfilePictureURL *string `json:"profilePictureURL"`
+	CurrencyMain      *string `json:"currencyMain"`
+	CurrencySub       *string `json:"currencySub"`
+}
+
+type UpdateUserPassword struct {
+	ID          uint64 `json:"id"`
+	Password    string `json:"password"`
+	NewPassword string `json:"newPassword"`
+}
+
 type User struct {
-	ID                uint64     `json:"id"`
-	CreatedAt         time.Time  `json:"createdAt"`
-	DeletedAt         *time.Time `json:"deletedAt"`
-	Name              string     `json:"name"`
-	Email             string     `json:"email"`
-	PhoneNumber       string     `json:"phoneNumber"`
-	ProfilePictureURL string     `json:"profilePictureURL"`
-	CurrencyMain      string     `json:"currencyMain"`
-	CurrencySub       *string    `json:"currencySub"`
-	DefaultAddress    uint64     `json:"defaultAddress"`
-	Addresses         []Address  `json:"addresses"`
+	ID                uint64    `json:"id"`
+	CreatedAt         time.Time `json:"createdAt"`
+	Name              string    `json:"name"`
+	Email             string    `json:"email"`
+	PhoneNumber       string    `json:"phoneNumber"`
+	ProfilePictureURL string    `json:"profilePictureURL"`
+	CurrencyMain      string    `json:"currencyMain"`
+	CurrencySub       *string   `json:"currencySub"`
+	Addresses         []Address `json:"addresses"`
 }
