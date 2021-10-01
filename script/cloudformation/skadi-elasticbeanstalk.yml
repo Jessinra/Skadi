@@ -153,13 +153,13 @@ Resources:
                 Value: !Ref VPC
               - Namespace: aws:ec2:vpc
                 OptionName: ELBScheme
-                Value: public
+                Value: internal
               - Namespace: aws:ec2:vpc
                 OptionName: ELBSubnets
                 Value: !Join
                   - ','
-                  - - !Ref PublicSubnet1
-                    - !Ref PublicSubnet2
+                  - - !Ref PrivateSubnet1
+                    - !Ref PrivateSubnet2
               - Namespace: aws:ec2:vpc
                 OptionName: AssociatePublicIpAddress
                 Value: false
@@ -167,8 +167,8 @@ Resources:
                 OptionName: Subnets
                 Value: !Join
                   - ','
-                  - - !Ref PublicSubnet1
-                    - !Ref PublicSubnet2
+                  - - !Ref PrivateSubnet1
+                    - !Ref PrivateSubnet2
 
             SolutionStackName: 64bit Amazon Linux 2 v3.4.0 running Go 1
             Tags: 
