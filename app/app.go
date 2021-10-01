@@ -5,9 +5,7 @@ import (
 	"gitlab.com/trivery-id/skadi/utils/logger"
 )
 
-var (
-	router = gin.Default()
-)
+var router = gin.Default()
 
 func StartApplication() {
 	initRoutes()

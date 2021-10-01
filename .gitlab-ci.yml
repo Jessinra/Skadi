@@ -86,7 +86,7 @@ build-dev:
 deploy-dev:
     stage: deploy
     environment:
-        name: development
+        name: develop
     image: 
         name: "amazon/aws-cli"
         entrypoint: [""]

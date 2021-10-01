@@ -3,7 +3,6 @@ package logger
 import (
 	"context"
 
-	"github.com/TheZeroSlave/zapsentry"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -41,21 +40,6 @@ func InitLogger() {
 
 	defaultLogger = &Logger{
 		zapLogger: zapLogger,
-	}
-}
-
-func InitializeSentryLogger(sentryDSN string) {
-	cfg := zapsentry.Configuration{
-		Level: zapcore.ErrorLevel, // when to send message to sentry
-	}
-
-	core, err := zapsentry.NewCore(cfg, zapsentry.NewSentryClientFromDSN(sentryDSN))
-	if err != nil {
-		defaultLogger.Warn("failed to init zap", zap.Error(err))
-	}
-
-	defaultLogger = &Logger{
-		zapLogger: zapsentry.AttachCoreToLogger(core, defaultLogger.zapLogger),
 	}
 }
 

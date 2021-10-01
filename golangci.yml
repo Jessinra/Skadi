@@ -29,6 +29,7 @@ linters-settings:
       - sloppyReassign
       - rangeValCopy
       - unnamedResult
+      - typeDefFirst
   gocyclo:
     min-complexity: 15
   goimports:
@@ -201,10 +202,7 @@ issues:
 
 run:
   skip-dirs:
-    - test/testdata_etc
-    - internal/cache
-    - internal/renameio
-    - internal/robustio
+    - graph/resolver
 
 # golangci.com configuration
 # https://github.com/golangci/golangci/wiki/Configuration

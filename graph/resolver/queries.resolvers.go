@@ -5,7 +5,7 @@ package resolver
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
@@ -13,7 +13,7 @@ import (
 
 func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {
 	if userID == nil {
-		return nil, fmt.Errorf("userID is required")
+		return nil, errors.New("userID is required")
 	}
 
 	todos, err := TodoService.GetAllTodos(ctx, *userID)

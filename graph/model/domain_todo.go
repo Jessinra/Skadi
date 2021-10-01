@@ -8,7 +8,7 @@ func NewTodo(in *domain.Todo) *Todo {
 }
 
 func NewTodos(in []domain.Todo) []Todo {
-	var out []Todo
+	out := []Todo{}
 	for _, v := range in {
 		out = append(out, Todo(v))
 	}

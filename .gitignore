@@ -1,6 +1,14 @@
 # ignore vscode file
 .vscode
 
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+skadi
+
 # ignore test artifacts
 internal/**/*.test
 external/**/*.test
