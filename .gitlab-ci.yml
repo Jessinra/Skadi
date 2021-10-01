@@ -10,55 +10,9 @@ cache:
         - vendor/
 
 stages:
-    - test
     - build
     - deploy
 
-lint:
-    image: golangci/golangci-lint:latest-alpine
-    stage: test
-    before_script:
-        - go mod tidy
-        - go mod vendor
-        - cd $GOPATH/src
-        - mkdir -p gitlab.com/$CI_PROJECT_NAMESPACE
-        - cd gitlab.com/$CI_PROJECT_NAMESPACE
-        - ln -s $CI_PROJECT_DIR
-        - cd $CI_PROJECT_NAME
-    script:
-        - golangci-lint run --config ./golangci.yml --timeout=15m
-    allow_failure: true
-    only:
-        - master
-
-unit_tests:
-    environment:
-        name: test
-        action: prepare
-    image: us.gcr.io/bonza-dev/golang-with-aws:1.16.5-alpine3.14
-    stage: test
-    variables:
-        # for dockertest: https://github.com/ory/dockertest#running-dockertest-in-gitlab-ci
-        DOCKER_HOST: tcp://docker:2375
-        DOCKER_DRIVER: overlay2
-        DOCKER_TLS_CERTDIR: ""
-    services:
-        - docker:dind
-    before_script:
-        - export ENV=test
-        - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-        - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-        - go mod tidy
-        - go mod vendor
-        - cd $GOPATH/src
-        - mkdir -p gitlab.com/$CI_PROJECT_NAMESPACE
-        - cd gitlab.com/$CI_PROJECT_NAMESPACE
-        - ln -s $CI_PROJECT_DIR
-        - cd $CI_PROJECT_NAME
-    script:
-        - go test -cover ./...
-    only:
-        - master
 
 build-dev:
     stage: build
