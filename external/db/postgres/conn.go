@@ -40,7 +40,7 @@ func NewGorm(creds DBCredential, opts ...db.Option) (*gorm.DB, error) {
 
 // getURL return postgres Database URI.
 func getURL(creds DBCredential) string {
-	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
 		creds.Host,
 		creds.Port,
 		creds.Username,
