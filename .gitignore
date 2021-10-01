@@ -1,2 +1,7 @@
 # ignore vscode file
 .vscode
+
+# ignore test artifacts
+internal/**/*.test
+external/**/*.test
+utils/**/*.test
