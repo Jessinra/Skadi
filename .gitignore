@@ -13,3 +13,6 @@ skadi
 internal/**/*.test
 external/**/*.test
 utils/**/*.test
+
+# whitelist for skadi
+!datasources/**

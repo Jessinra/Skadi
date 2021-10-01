@@ -37,6 +37,6 @@
   },
   {
     "ParameterKey": "IntegrationAppLoadBalancerListener",
-    "ParameterValue": "arn:aws:elasticloadbalancing:ap-southeast-1:442662599070:listener/app/awseb-AWSEB-9QGDK45KQ7VW/a601a7bf56c9cd14/9cafa4d582247bba"
+    "ParameterValue": "arn:aws:elasticloadbalancing:ap-southeast-1:442662599070:listener/app/awseb-AWSEB-1XQSCPWJHYTJE/e84f9f268b63ab41/3dbb5d5e8b7c86e3"
   }
 ]
