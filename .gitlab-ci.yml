@@ -1,0 +1,133 @@
+image: golang:1.14
+
+cache:
+    paths:
+        - /apt-cache
+        - /go/src/github.com
+        - /go/src/golang.org
+        - /go/src/google.golang.org
+        - /go/src/gopkg.in
+        - vendor/
+
+stages:
+    - test
+    - build
+    - deploy
+
+lint:
+    image: golangci/golangci-lint:latest-alpine
+    stage: test
+    before_script:
+        - go mod tidy
+        - go mod vendor
+        - cd $GOPATH/src
+        - mkdir -p gitlab.com/$CI_PROJECT_NAMESPACE
+        - cd gitlab.com/$CI_PROJECT_NAMESPACE
+        - ln -s $CI_PROJECT_DIR
+        - cd $CI_PROJECT_NAME
+    script:
+        - golangci-lint run --config ./golangci.yml --timeout=15m
+    allow_failure: true
+    except:
+        - tags
+        - develop
+        - master
+
+unit_tests:
+    environment:
+        name: test
+        action: prepare
+    image: us.gcr.io/bonza-dev/golang-with-aws:1.16.5-alpine3.14
+    stage: test
+    variables:
+        # for dockertest: https://github.com/ory/dockertest#running-dockertest-in-gitlab-ci
+        DOCKER_HOST: tcp://docker:2375
+        DOCKER_DRIVER: overlay2
+        DOCKER_TLS_CERTDIR: ""
+        LAMBDA_CONVERT_CSV_TO_XLSX: 'parn-dev-csv-to-xlsx-convertCSVtoXLSXFunction-ZdEgo1h2CtFS'
+    services:
+        - docker:dind
+    before_script:
+        - export ENV=test
+        - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+        - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+        - go mod tidy
+        - go mod vendor
+        - cd $GOPATH/src
+        - mkdir -p gitlab.com/$CI_PROJECT_NAMESPACE
+        - cd gitlab.com/$CI_PROJECT_NAMESPACE
+        - ln -s $CI_PROJECT_DIR
+        - cd $CI_PROJECT_NAME
+    script:
+        - go test -cover ./...
+    except:
+        - tags
+        - develop
+        - master
+
+build-dev:
+    stage: build
+    variables:
+        ENV: 'dev'
+        APP_NAME: 'skadi'
+        ARTIFACT_NAME: '$APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
+    before_script:
+        - apt-get update && apt-get install zip -y
+    script:
+        - GOOS=linux GOARCH=amd64 go build -mod=readonly -o bin/application
+        - 'zip -r "$ARTIFACT_NAME" .'
+    artifacts:
+        paths:
+            - $ARTIFACT_NAME
+        expire_in: 30 min
+    only:
+        - master
+
+deploy-dev:
+    stage: deploy
+    environment:
+        name: development
+    image: 
+        name: "amazon/aws-cli"
+        entrypoint: [""]
+    variables:
+        ENV: 'dev'
+        GIN_MODE: 'release'
+        SILENT_GORM: 'true'
+        APP_NAME: 'skadi'
+        S3_BUCKET: 'trivery-dev-skadi'
+        VERSION: '$CI_COMMIT_SHORT_SHA'
+        ARTIFACT_NAME: '$APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
+        ENV_NAME: 'parnassus-dev'
+        REGION: 'ap-southeast-1'
+    script:
+        - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        - aws configure set region $REGION
+        - aws configure list-profiles
+        - aws configure list
+        - aws s3 ls
+        - aws s3 cp ./$ARTIFACT_NAME s3://$S3_BUCKET/
+        - >
+          aws elasticbeanstalk create-application-version 
+          --application-name $APP_NAME 
+          --version-label $VERSION 
+          --description="Parnassus $VERSION" 
+          --source-bundle S3Bucket=$S3_BUCKET,S3Key=$ARTIFACT_NAME 
+          --auto-create-application 
+          --region=$REGION 
+        - >
+          aws elasticbeanstalk update-environment 
+          --application-name $APP_NAME 
+          --environment-name $ENV_NAME 
+          --version-label $VERSION 
+          --region=$REGION 
+          --option-settings 
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=ENV,Value=$ENV 
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=GIN_MODE,Value=$GIN_MODE 
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=SILENT_GORM,Value=$SILENT_GORM 
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=VERSION,Value=$VERSION 
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=AWS_SECRET_ACCESS_KEY,Value=$AWS_SECRET_ACCESS_KEY
+          Namespace=aws:elasticbeanstalk:application:environment,OptionName=AWS_ACCESS_KEY_ID,Value=$AWS_ACCESS_KEY_ID
+    only:
+        - master
