@@ -27,7 +27,6 @@ github.com/99designs/gqlgen/plugin/resolvergen
 github.com/99designs/gqlgen/plugin/servergen
 # github.com/TheZeroSlave/zapsentry v1.8.0
 ## explicit; go 1.12
-github.com/TheZeroSlave/zapsentry
 # github.com/agnivade/levenshtein v1.1.0
 ## explicit; go 1.13
 github.com/agnivade/levenshtein
@@ -39,9 +38,6 @@ github.com/cpuguy83/go-md2man/v2/md2man
 github.com/davecgh/go-spew/spew
 # github.com/getsentry/sentry-go v0.10.0
 ## explicit; go 1.13
-github.com/getsentry/sentry-go
-github.com/getsentry/sentry-go/internal/crypto/randutil
-github.com/getsentry/sentry-go/internal/debug
 # github.com/gin-contrib/sse v0.1.0
 ## explicit; go 1.12
 github.com/gin-contrib/sse
@@ -106,12 +102,6 @@ github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/rs/zerolog v1.25.0
-## explicit; go 1.15
-github.com/rs/zerolog
-github.com/rs/zerolog/internal/cbor
-github.com/rs/zerolog/internal/json
-github.com/rs/zerolog/log
 # github.com/russross/blackfriday/v2 v2.0.1
 ## explicit
 github.com/russross/blackfriday/v2
