@@ -44,7 +44,6 @@ unit_tests:
         DOCKER_HOST: tcp://docker:2375
         DOCKER_DRIVER: overlay2
         DOCKER_TLS_CERTDIR: ""
-        LAMBDA_CONVERT_CSV_TO_XLSX: 'parn-dev-csv-to-xlsx-convertCSVtoXLSXFunction-ZdEgo1h2CtFS'
     services:
         - docker:dind
     before_script:
@@ -69,8 +68,8 @@ build-dev:
     stage: build
     variables:
         ENV: 'dev'
-        APP_NAME: 'skadi'
-        ARTIFACT_NAME: '$APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
+        EB_APP_NAME: 'skadi'
+        ARTIFACT_NAME: '$EB_APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
     before_script:
         - apt-get update && apt-get install zip -y
     script:
@@ -94,11 +93,11 @@ deploy-dev:
         ENV: 'dev'
         GIN_MODE: 'release'
         SILENT_GORM: 'true'
-        APP_NAME: 'skadi'
+        EB_APP_NAME: 'skadi'
+        EB_ENV_NAME: 'skadi-dev'
         S3_BUCKET: 'trivery-dev-skadi'
         VERSION: '$CI_COMMIT_SHORT_SHA'
-        ARTIFACT_NAME: '$APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
-        ENV_NAME: 'parnassus-dev'
+        ARTIFACT_NAME: '$EB_APP_NAME-$ENV-$CI_COMMIT_SHORT_SHA.zip'
         REGION: 'ap-southeast-1'
     script:
         - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
@@ -110,7 +109,7 @@ deploy-dev:
         - aws s3 cp ./$ARTIFACT_NAME s3://$S3_BUCKET/
         - >
           aws elasticbeanstalk create-application-version 
-          --application-name $APP_NAME 
+          --application-name $EB_APP_NAME 
           --version-label $VERSION 
           --description="Parnassus $VERSION" 
           --source-bundle S3Bucket=$S3_BUCKET,S3Key=$ARTIFACT_NAME 
@@ -118,8 +117,8 @@ deploy-dev:
           --region=$REGION 
         - >
           aws elasticbeanstalk update-environment 
-          --application-name $APP_NAME 
-          --environment-name $ENV_NAME 
+          --application-name $EB_APP_NAME 
+          --environment-name $EB_ENV_NAME 
           --version-label $VERSION 
           --region=$REGION 
           --option-settings 
