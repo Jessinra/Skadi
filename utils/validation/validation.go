@@ -59,3 +59,7 @@ func LessOrEqual(value interface{}) validation.ThresholdRule {
 func Length(min, max int) validation.LengthRule {
 	return validation.Length(min, max)
 }
+
+func When(condition bool, rules ...validation.Rule) validation.WhenRule {
+	return validation.When(condition, rules...)
+}

@@ -63,10 +63,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateTodo         func(childComplexity int, input model.CreateTodo) int
-		RegisterUser       func(childComplexity int, input model.RegisterUser) int
-		UpdateUser         func(childComplexity int, input model.UpdateUser) int
-		UpdateUserPassword func(childComplexity int, input model.UpdateUserPassword) int
+		CreateProduct         func(childComplexity int, input model.CreateProduct) int
+		CreateProductLocation func(childComplexity int, input model.CreateProductLocation) int
+		CreateProductPrice    func(childComplexity int, input model.CreateProductPrice) int
+		CreateTodo            func(childComplexity int, input model.CreateTodo) int
+		DeleteProductLocation func(childComplexity int, input model.DeleteProductLocation) int
+		DeleteProductPrice    func(childComplexity int, input model.DeleteProductPrice) int
+		RegisterUser          func(childComplexity int, input model.RegisterUser) int
+		UpdateProductLocation func(childComplexity int, input model.UpdateProductLocation) int
+		UpdateProductPrice    func(childComplexity int, input model.UpdateProductPrice) int
+		UpdateUser            func(childComplexity int, input model.UpdateUser) int
+		UpdateUserPassword    func(childComplexity int, input model.UpdateUserPassword) int
 	}
 
 	Order struct {
@@ -93,11 +100,12 @@ type ComplexityRoot struct {
 	}
 
 	OrderPricing struct {
-		Commission     func(childComplexity int) int
-		Currency       func(childComplexity int) int
-		OrderID        func(childComplexity int) int
-		Price          func(childComplexity int) int
-		PriceEstimated func(childComplexity int) int
+		Commission  func(childComplexity int) int
+		Currency    func(childComplexity int) int
+		IsEstimated func(childComplexity int) int
+		OrderID     func(childComplexity int) int
+		Price       func(childComplexity int) int
+		PriceMax    func(childComplexity int) int
 	}
 
 	OrderReview struct {
@@ -123,19 +131,16 @@ type ComplexityRoot struct {
 	}
 
 	Product struct {
-		Categories     func(childComplexity int) int
-		Countries      func(childComplexity int) int
-		CreatedAt      func(childComplexity int) int
-		DeletedAt      func(childComplexity int) int
-		Description    func(childComplexity int) int
-		Dimensions     func(childComplexity int) int
-		ID             func(childComplexity int) int
-		ImagesURLs     func(childComplexity int) int
-		Locations      func(childComplexity int) int
-		Name           func(childComplexity int) int
-		Price          func(childComplexity int) int
-		PriceEstimated func(childComplexity int) int
-		Weight         func(childComplexity int) int
+		Categories  func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		Dimensions  func(childComplexity int) int
+		ID          func(childComplexity int) int
+		ImagesURLs  func(childComplexity int) int
+		Locations   func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Prices      func(childComplexity int) int
+		Weight      func(childComplexity int) int
 	}
 
 	ProductLocation struct {
@@ -144,7 +149,6 @@ type ComplexityRoot struct {
 		City      func(childComplexity int) int
 		Country   func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
-		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Latitude  func(childComplexity int) int
 		Longitude func(childComplexity int) int
@@ -156,8 +160,20 @@ type ComplexityRoot struct {
 		UserID    func(childComplexity int) int
 	}
 
+	ProductPrice struct {
+		CreatedAt        func(childComplexity int) int
+		Currency         func(childComplexity int) int
+		ID               func(childComplexity int) int
+		IsPriceEstimated func(childComplexity int) int
+		Price            func(childComplexity int) int
+		ProductID        func(childComplexity int) int
+		UserID           func(childComplexity int) int
+	}
+
 	Query struct {
 		GetTodos func(childComplexity int, userID *uint64) int
+		Product  func(childComplexity int, id uint64) int
+		Products func(childComplexity int, limit *int, offset *int) int
 		User     func(childComplexity int, id uint64) int
 	}
 
@@ -187,10 +203,19 @@ type MutationResolver interface {
 	RegisterUser(ctx context.Context, input model.RegisterUser) (*model.User, error)
 	UpdateUser(ctx context.Context, input model.UpdateUser) (*model.User, error)
 	UpdateUserPassword(ctx context.Context, input model.UpdateUserPassword) (bool, error)
+	CreateProduct(ctx context.Context, input model.CreateProduct) (*model.Product, error)
+	CreateProductLocation(ctx context.Context, input model.CreateProductLocation) (*model.ProductLocation, error)
+	UpdateProductLocation(ctx context.Context, input model.UpdateProductLocation) (*model.ProductLocation, error)
+	DeleteProductLocation(ctx context.Context, input model.DeleteProductLocation) (bool, error)
+	CreateProductPrice(ctx context.Context, input model.CreateProductPrice) (*model.ProductPrice, error)
+	UpdateProductPrice(ctx context.Context, input model.UpdateProductPrice) (*model.ProductPrice, error)
+	DeleteProductPrice(ctx context.Context, input model.DeleteProductPrice) (bool, error)
 	CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, id uint64) (*model.User, error)
+	Product(ctx context.Context, id uint64) (*model.Product, error)
+	Products(ctx context.Context, limit *int, offset *int) ([]model.Product, error)
 	GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error)
 }
 type UserResolver interface {
@@ -310,6 +335,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Address.UserID(childComplexity), true
 
+	case "Mutation.createProduct":
+		if e.complexity.Mutation.CreateProduct == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProduct_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateProduct(childComplexity, args["input"].(model.CreateProduct)), true
+
+	case "Mutation.createProductLocation":
+		if e.complexity.Mutation.CreateProductLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProductLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateProductLocation(childComplexity, args["input"].(model.CreateProductLocation)), true
+
+	case "Mutation.createProductPrice":
+		if e.complexity.Mutation.CreateProductPrice == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProductPrice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateProductPrice(childComplexity, args["input"].(model.CreateProductPrice)), true
+
 	case "Mutation.createTodo":
 		if e.complexity.Mutation.CreateTodo == nil {
 			break
@@ -322,6 +383,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateTodo(childComplexity, args["input"].(model.CreateTodo)), true
 
+	case "Mutation.deleteProductLocation":
+		if e.complexity.Mutation.DeleteProductLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProductLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteProductLocation(childComplexity, args["input"].(model.DeleteProductLocation)), true
+
+	case "Mutation.deleteProductPrice":
+		if e.complexity.Mutation.DeleteProductPrice == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteProductPrice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteProductPrice(childComplexity, args["input"].(model.DeleteProductPrice)), true
+
 	case "Mutation.registerUser":
 		if e.complexity.Mutation.RegisterUser == nil {
 			break
@@ -333,6 +418,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RegisterUser(childComplexity, args["input"].(model.RegisterUser)), true
+
+	case "Mutation.updateProductLocation":
+		if e.complexity.Mutation.UpdateProductLocation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProductLocation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProductLocation(childComplexity, args["input"].(model.UpdateProductLocation)), true
+
+	case "Mutation.updateProductPrice":
+		if e.complexity.Mutation.UpdateProductPrice == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProductPrice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProductPrice(childComplexity, args["input"].(model.UpdateProductPrice)), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -491,6 +600,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OrderPricing.Currency(childComplexity), true
 
+	case "OrderPricing.isEstimated":
+		if e.complexity.OrderPricing.IsEstimated == nil {
+			break
+		}
+
+		return e.complexity.OrderPricing.IsEstimated(childComplexity), true
+
 	case "OrderPricing.orderID":
 		if e.complexity.OrderPricing.OrderID == nil {
 			break
@@ -505,12 +621,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OrderPricing.Price(childComplexity), true
 
-	case "OrderPricing.priceEstimated":
-		if e.complexity.OrderPricing.PriceEstimated == nil {
+	case "OrderPricing.priceMax":
+		if e.complexity.OrderPricing.PriceMax == nil {
 			break
 		}
 
-		return e.complexity.OrderPricing.PriceEstimated(childComplexity), true
+		return e.complexity.OrderPricing.PriceMax(childComplexity), true
 
 	case "OrderReview.createdAt":
 		if e.complexity.OrderReview.CreatedAt == nil {
@@ -631,26 +747,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Categories(childComplexity), true
 
-	case "Product.countries":
-		if e.complexity.Product.Countries == nil {
-			break
-		}
-
-		return e.complexity.Product.Countries(childComplexity), true
-
 	case "Product.createdAt":
 		if e.complexity.Product.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Product.CreatedAt(childComplexity), true
-
-	case "Product.deletedAt":
-		if e.complexity.Product.DeletedAt == nil {
-			break
-		}
-
-		return e.complexity.Product.DeletedAt(childComplexity), true
 
 	case "Product.description":
 		if e.complexity.Product.Description == nil {
@@ -694,19 +796,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Name(childComplexity), true
 
-	case "Product.price":
-		if e.complexity.Product.Price == nil {
+	case "Product.prices":
+		if e.complexity.Product.Prices == nil {
 			break
 		}
 
-		return e.complexity.Product.Price(childComplexity), true
-
-	case "Product.priceEstimated":
-		if e.complexity.Product.PriceEstimated == nil {
-			break
-		}
-
-		return e.complexity.Product.PriceEstimated(childComplexity), true
+		return e.complexity.Product.Prices(childComplexity), true
 
 	case "Product.weight":
 		if e.complexity.Product.Weight == nil {
@@ -749,13 +844,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProductLocation.CreatedAt(childComplexity), true
-
-	case "ProductLocation.deletedAt":
-		if e.complexity.ProductLocation.DeletedAt == nil {
-			break
-		}
-
-		return e.complexity.ProductLocation.DeletedAt(childComplexity), true
 
 	case "ProductLocation.id":
 		if e.complexity.ProductLocation.ID == nil {
@@ -820,6 +908,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProductLocation.UserID(childComplexity), true
 
+	case "ProductPrice.createdAt":
+		if e.complexity.ProductPrice.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.CreatedAt(childComplexity), true
+
+	case "ProductPrice.currency":
+		if e.complexity.ProductPrice.Currency == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.Currency(childComplexity), true
+
+	case "ProductPrice.id":
+		if e.complexity.ProductPrice.ID == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.ID(childComplexity), true
+
+	case "ProductPrice.isPriceEstimated":
+		if e.complexity.ProductPrice.IsPriceEstimated == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.IsPriceEstimated(childComplexity), true
+
+	case "ProductPrice.price":
+		if e.complexity.ProductPrice.Price == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.Price(childComplexity), true
+
+	case "ProductPrice.productID":
+		if e.complexity.ProductPrice.ProductID == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.ProductID(childComplexity), true
+
+	case "ProductPrice.userID":
+		if e.complexity.ProductPrice.UserID == nil {
+			break
+		}
+
+		return e.complexity.ProductPrice.UserID(childComplexity), true
+
 	case "Query.getTodos":
 		if e.complexity.Query.GetTodos == nil {
 			break
@@ -831,6 +968,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetTodos(childComplexity, args["userID"].(*uint64)), true
+
+	case "Query.product":
+		if e.complexity.Query.Product == nil {
+			break
+		}
+
+		args, err := ec.field_Query_product_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Product(childComplexity, args["id"].(uint64)), true
+
+	case "Query.products":
+		if e.complexity.Query.Products == nil {
+			break
+		}
+
+		args, err := ec.field_Query_products_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Products(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.user":
 		if e.complexity.Query.User == nil {
@@ -1057,7 +1218,8 @@ type OrderPricing {
     orderID: ID!
     currency: String!
     price: Uint64!
-    priceEstimated: Uint64!
+    priceMax: Uint64!
+    isEstimated: Boolean!
     commission: Int!
 }
 
@@ -1098,42 +1260,50 @@ type OrderReview {
 type Product {
     id: ID!
     createdAt: Time!
-    deletedAt: Time
 
     name: String!
-    description: String
+    description: String!
     imagesURLs: [String!]
-    locations: [ProductLocation!]  
-    price: Uint64!            
-    priceEstimated: Boolean!
-    weight: String
-    dimensions: String
-
-    countries: String!
+    weight: String!
+    dimensions: String!
     categories: [String!]
+
+    locations: [ProductLocation!]  
+    prices: [ProductPrice!]
 }
 
 type ProductLocation {
     id: ID!
     createdAt: Time!
-    deletedAt: Time
 
     userID: ID!
     productID: ID!
     
     text: String!
-
     country: String!
     province: String!
     city: String!
-    area: String
-    street: String
-    building: String
-    store: String
+    area: String!
+    street: String!
+    building: String!
+    store: String!
 
-    longitude: Float
-    latitude: Float    
-}`, BuiltIn: false},
+    longitude: Float!
+    latitude: Float!
+}
+
+type ProductPrice {
+    id: ID!
+    createdAt: Time!
+
+    userID: ID!
+    productID: ID!
+    
+    currency: String!
+    price: Uint64!
+    isPriceEstimated: Boolean!
+}
+`, BuiltIn: false},
 	{Name: "graph/schema/d_user.gql", Input: `
 
 type User {
@@ -1171,6 +1341,72 @@ input UpdateUserPassword {
     password: String!
     newPassword: String!
 }`, BuiltIn: false},
+	{Name: "graph/schema/i_product.gql", Input: `
+input CreateProduct{
+    name: String!
+    description: String!
+    imagesURLs: [String!]!
+    weight: String
+    dimensions: String
+    categories: [String!]!
+
+    location: CreateProductLocation!
+    price: CreateProductPrice!
+}
+
+input CreateProductLocation{
+    productID: ID
+    
+    text: String!
+    country: String!
+    province: String!
+    city: String!
+    area: String
+    street: String
+    building: String
+    store: String
+    
+    longitude: Float
+    latitude: Float   
+}
+
+input UpdateProductLocation{
+    id: ID!
+    
+    text: String
+    country: String
+    province: String
+    city: String
+    area: String
+    street: String
+    building: String
+    store: String
+    
+    longitude: Float
+    latitude: Float   
+}
+
+input DeleteProductLocation{
+    id: ID!
+}
+
+input CreateProductPrice{
+    productID: ID
+
+    currency: String!
+    price: Uint64!
+    isPriceEstimated: Boolean!
+}
+
+input UpdateProductPrice{
+    id: ID!
+    price: Uint64
+    isPriceEstimated: Boolean
+}
+
+input DeleteProductPrice{
+    id: ID!
+}`, BuiltIn: false},
 	{Name: "graph/schema/mutations.gql", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
@@ -1182,6 +1418,16 @@ type Mutation {
     updateUser(input: UpdateUser!): User!
     updateUserPassword(input: UpdateUserPassword!): Boolean!
 
+    createProduct(input: CreateProduct!): Product!
+
+    createProductLocation(input: CreateProductLocation!): ProductLocation!
+    updateProductLocation(input: UpdateProductLocation!): ProductLocation!
+    deleteProductLocation(input: DeleteProductLocation!): Boolean!
+
+    createProductPrice(input: CreateProductPrice!): ProductPrice!
+    updateProductPrice(input: UpdateProductPrice!): ProductPrice!
+    deleteProductPrice(input: DeleteProductPrice!): Boolean!
+
     createTodo(input: CreateTodo!): Todo!
 }
 `, BuiltIn: false},
@@ -1191,6 +1437,9 @@ type Mutation {
 
 type Query {
 	user(id: ID!): User!
+
+	product(id: ID!): Product!
+	products(limit: Int, offset: Int): [Product!]
 
 	getTodos(userID: ID): [Todo!]!
 }
@@ -1219,6 +1468,51 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createProductLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateProductLocation
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductLocation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createProductPrice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateProductPrice
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductPrice(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createProduct_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateProduct
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateProduct2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProduct(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1234,6 +1528,36 @@ func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteProductLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DeleteProductLocation
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDeleteProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐDeleteProductLocation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteProductPrice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DeleteProductPrice
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDeleteProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐDeleteProductPrice(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1241,6 +1565,36 @@ func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNRegisterUser2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐRegisterUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProductLocation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProductLocation
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateProductLocation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProductPrice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateProductPrice
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateProductPrice(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1306,6 +1660,45 @@ func (ec *executionContext) field_Query_getTodos_args(ctx context.Context, rawAr
 		}
 	}
 	args["userID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_product_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uint64
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2uint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_products_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
 	return args, nil
 }
 
@@ -1941,6 +2334,300 @@ func (ec *executionContext) _Mutation_updateUserPassword(ctx context.Context, fi
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateUserPassword(rctx, args["input"].(model.UpdateUserPassword))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createProduct_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateProduct(rctx, args["input"].(model.CreateProduct))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Product)
+	fc.Result = res
+	return ec.marshalNProduct2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProduct(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createProductLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createProductLocation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateProductLocation(rctx, args["input"].(model.CreateProductLocation))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProductLocation)
+	fc.Result = res
+	return ec.marshalNProductLocation2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateProductLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateProductLocation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProductLocation(rctx, args["input"].(model.UpdateProductLocation))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProductLocation)
+	fc.Result = res
+	return ec.marshalNProductLocation2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteProductLocation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteProductLocation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProductLocation(rctx, args["input"].(model.DeleteProductLocation))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createProductPrice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createProductPrice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateProductPrice(rctx, args["input"].(model.CreateProductPrice))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProductPrice)
+	fc.Result = res
+	return ec.marshalNProductPrice2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPrice(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateProductPrice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateProductPrice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProductPrice(rctx, args["input"].(model.UpdateProductPrice))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProductPrice)
+	fc.Result = res
+	return ec.marshalNProductPrice2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPrice(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteProductPrice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteProductPrice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteProductPrice(rctx, args["input"].(model.DeleteProductPrice))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2687,7 +3374,7 @@ func (ec *executionContext) _OrderPricing_price(ctx context.Context, field graph
 	return ec.marshalNUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OrderPricing_priceEstimated(ctx context.Context, field graphql.CollectedField, obj *model.OrderPricing) (ret graphql.Marshaler) {
+func (ec *executionContext) _OrderPricing_priceMax(ctx context.Context, field graphql.CollectedField, obj *model.OrderPricing) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2705,7 +3392,7 @@ func (ec *executionContext) _OrderPricing_priceEstimated(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PriceEstimated, nil
+		return obj.PriceMax, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2720,6 +3407,41 @@ func (ec *executionContext) _OrderPricing_priceEstimated(ctx context.Context, fi
 	res := resTmp.(uint64)
 	fc.Result = res
 	return ec.marshalNUint642uint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderPricing_isEstimated(ctx context.Context, field graphql.CollectedField, obj *model.OrderPricing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OrderPricing",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsEstimated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _OrderPricing_commission(ctx context.Context, field graphql.CollectedField, obj *model.OrderPricing) (ret graphql.Marshaler) {
@@ -3363,38 +4085,6 @@ func (ec *executionContext) _Product_createdAt(ctx context.Context, field graphq
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Product_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Product_name(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3455,11 +4145,14 @@ func (ec *executionContext) _Product_description(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Product_imagesURLs(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
@@ -3494,108 +4187,6 @@ func (ec *executionContext) _Product_imagesURLs(ctx context.Context, field graph
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Product_locations(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Locations, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]model.ProductLocation)
-	fc.Result = res
-	return ec.marshalOProductLocation2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocationᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Product_price(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Price, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(uint64)
-	fc.Result = res
-	return ec.marshalNUint642uint64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Product_priceEstimated(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PriceEstimated, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Product_weight(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3621,11 +4212,14 @@ func (ec *executionContext) _Product_weight(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Product_dimensions(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
@@ -3647,38 +4241,6 @@ func (ec *executionContext) _Product_dimensions(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Dimensions, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Product_countries(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Countries, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3725,6 +4287,70 @@ func (ec *executionContext) _Product_categories(ctx context.Context, field graph
 	res := resTmp.([]string)
 	fc.Result = res
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Product_locations(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Locations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.ProductLocation)
+	fc.Result = res
+	return ec.marshalOProductLocation2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Product_prices(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Prices, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.ProductPrice)
+	fc.Result = res
+	return ec.marshalOProductPrice2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPriceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -3795,38 +4421,6 @@ func (ec *executionContext) _ProductLocation_createdAt(ctx context.Context, fiel
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ProductLocation_deletedAt(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ProductLocation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_userID(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4064,11 +4658,14 @@ func (ec *executionContext) _ProductLocation_area(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_street(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4096,11 +4693,14 @@ func (ec *executionContext) _ProductLocation_street(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_building(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4128,11 +4728,14 @@ func (ec *executionContext) _ProductLocation_building(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_store(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4160,11 +4763,14 @@ func (ec *executionContext) _ProductLocation_store(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_longitude(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4192,11 +4798,14 @@ func (ec *executionContext) _ProductLocation_longitude(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProductLocation_latitude(ctx context.Context, field graphql.CollectedField, obj *model.ProductLocation) (ret graphql.Marshaler) {
@@ -4224,11 +4833,259 @@ func (ec *executionContext) _ProductLocation_latitude(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_id(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	fc.Result = res
+	return ec.marshalNID2uint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_userID(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	fc.Result = res
+	return ec.marshalNID2uint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_productID(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProductID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	fc.Result = res
+	return ec.marshalNID2uint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_currency(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Currency, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_price(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Price, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(uint64)
+	fc.Result = res
+	return ec.marshalNUint642uint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProductPrice_isPriceEstimated(ctx context.Context, field graphql.CollectedField, obj *model.ProductPrice) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProductPrice",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsPriceEstimated, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4271,6 +5128,87 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	res := resTmp.(*model.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_product(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_product_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Product(rctx, args["id"].(uint64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Product)
+	fc.Result = res
+	return ec.marshalNProduct2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProduct(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_products(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_products_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Products(rctx, args["limit"].(*int), args["offset"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.Product)
+	fc.Result = res
+	return ec.marshalOProduct2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getTodos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6024,6 +6962,235 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateProduct(ctx context.Context, obj interface{}) (model.CreateProduct, error) {
+	var it model.CreateProduct
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "imagesURLs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imagesURLs"))
+			it.ImagesURLs, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dimensions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dimensions"))
+			it.Dimensions, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "categories":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
+			it.Categories, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalNCreateProductLocation2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductLocation(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			it.Price, err = ec.unmarshalNCreateProductPrice2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductPrice(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateProductLocation(ctx context.Context, obj interface{}) (model.CreateProductLocation, error) {
+	var it model.CreateProductLocation
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "productID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productID"))
+			it.ProductID, err = ec.unmarshalOID2ᚖuint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "text":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "country":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("country"))
+			it.Country, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "province":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("province"))
+			it.Province, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "city":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "area":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("area"))
+			it.Area, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "street":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("street"))
+			it.Street, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "building":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("building"))
+			it.Building, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "store":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("store"))
+			it.Store, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "longitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("longitude"))
+			it.Longitude, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "latitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("latitude"))
+			it.Latitude, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateProductPrice(ctx context.Context, obj interface{}) (model.CreateProductPrice, error) {
+	var it model.CreateProductPrice
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "productID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productID"))
+			it.ProductID, err = ec.unmarshalOID2ᚖuint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "currency":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("currency"))
+			it.Currency, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			it.Price, err = ec.unmarshalNUint642uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPriceEstimated":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPriceEstimated"))
+			it.IsPriceEstimated, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateTodo(ctx context.Context, obj interface{}) (model.CreateTodo, error) {
 	var it model.CreateTodo
 	asMap := map[string]interface{}{}
@@ -6063,6 +7230,52 @@ func (ec *executionContext) unmarshalInputCreateTodo(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteProductLocation(ctx context.Context, obj interface{}) (model.DeleteProductLocation, error) {
+	var it model.DeleteProductLocation
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteProductPrice(ctx context.Context, obj interface{}) (model.DeleteProductPrice, error) {
+	var it model.DeleteProductPrice
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRegisterUser(ctx context.Context, obj interface{}) (model.RegisterUser, error) {
 	var it model.RegisterUser
 	asMap := map[string]interface{}{}
@@ -6093,6 +7306,148 @@ func (ec *executionContext) unmarshalInputRegisterUser(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProductLocation(ctx context.Context, obj interface{}) (model.UpdateProductLocation, error) {
+	var it model.UpdateProductLocation
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "text":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("text"))
+			it.Text, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "country":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("country"))
+			it.Country, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "province":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("province"))
+			it.Province, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "city":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+			it.City, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "area":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("area"))
+			it.Area, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "street":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("street"))
+			it.Street, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "building":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("building"))
+			it.Building, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "store":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("store"))
+			it.Store, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "longitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("longitude"))
+			it.Longitude, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "latitude":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("latitude"))
+			it.Latitude, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateProductPrice(ctx context.Context, obj interface{}) (model.UpdateProductPrice, error) {
+	var it model.UpdateProductPrice
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "price":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			it.Price, err = ec.unmarshalOUint642ᚖuint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isPriceEstimated":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("isPriceEstimated"))
+			it.IsPriceEstimated, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6313,6 +7668,41 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createProduct":
+			out.Values[i] = ec._Mutation_createProduct(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createProductLocation":
+			out.Values[i] = ec._Mutation_createProductLocation(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateProductLocation":
+			out.Values[i] = ec._Mutation_updateProductLocation(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteProductLocation":
+			out.Values[i] = ec._Mutation_deleteProductLocation(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createProductPrice":
+			out.Values[i] = ec._Mutation_createProductPrice(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateProductPrice":
+			out.Values[i] = ec._Mutation_updateProductPrice(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteProductPrice":
+			out.Values[i] = ec._Mutation_deleteProductPrice(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createTodo":
 			out.Values[i] = ec._Mutation_createTodo(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6472,8 +7862,13 @@ func (ec *executionContext) _OrderPricing(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "priceEstimated":
-			out.Values[i] = ec._OrderPricing_priceEstimated(ctx, field, obj)
+		case "priceMax":
+			out.Values[i] = ec._OrderPricing_priceMax(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isEstimated":
+			out.Values[i] = ec._OrderPricing_isEstimated(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6614,8 +8009,6 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "deletedAt":
-			out.Values[i] = ec._Product_deletedAt(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Product_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6623,31 +8016,27 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "description":
 			out.Values[i] = ec._Product_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "imagesURLs":
 			out.Values[i] = ec._Product_imagesURLs(ctx, field, obj)
-		case "locations":
-			out.Values[i] = ec._Product_locations(ctx, field, obj)
-		case "price":
-			out.Values[i] = ec._Product_price(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "priceEstimated":
-			out.Values[i] = ec._Product_priceEstimated(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "weight":
 			out.Values[i] = ec._Product_weight(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "dimensions":
 			out.Values[i] = ec._Product_dimensions(ctx, field, obj)
-		case "countries":
-			out.Values[i] = ec._Product_countries(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "categories":
 			out.Values[i] = ec._Product_categories(ctx, field, obj)
+		case "locations":
+			out.Values[i] = ec._Product_locations(ctx, field, obj)
+		case "prices":
+			out.Values[i] = ec._Product_prices(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6680,8 +8069,6 @@ func (ec *executionContext) _ProductLocation(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "deletedAt":
-			out.Values[i] = ec._ProductLocation_deletedAt(ctx, field, obj)
 		case "userID":
 			out.Values[i] = ec._ProductLocation_userID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6714,16 +8101,91 @@ func (ec *executionContext) _ProductLocation(ctx context.Context, sel ast.Select
 			}
 		case "area":
 			out.Values[i] = ec._ProductLocation_area(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "street":
 			out.Values[i] = ec._ProductLocation_street(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "building":
 			out.Values[i] = ec._ProductLocation_building(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "store":
 			out.Values[i] = ec._ProductLocation_store(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "longitude":
 			out.Values[i] = ec._ProductLocation_longitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "latitude":
 			out.Values[i] = ec._ProductLocation_latitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var productPriceImplementors = []string{"ProductPrice"}
+
+func (ec *executionContext) _ProductPrice(ctx context.Context, sel ast.SelectionSet, obj *model.ProductPrice) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, productPriceImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProductPrice")
+		case "id":
+			out.Values[i] = ec._ProductPrice_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._ProductPrice_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._ProductPrice_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "productID":
+			out.Values[i] = ec._ProductPrice_productID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currency":
+			out.Values[i] = ec._ProductPrice_currency(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "price":
+			out.Values[i] = ec._ProductPrice_price(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isPriceEstimated":
+			out.Values[i] = ec._ProductPrice_isPriceEstimated(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6762,6 +8224,31 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "product":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_product(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "products":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_products(ctx, field)
 				return res
 			})
 		case "getTodos":
@@ -7191,9 +8678,59 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCreateProduct2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProduct(ctx context.Context, v interface{}) (model.CreateProduct, error) {
+	res, err := ec.unmarshalInputCreateProduct(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductLocation(ctx context.Context, v interface{}) (model.CreateProductLocation, error) {
+	res, err := ec.unmarshalInputCreateProductLocation(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateProductLocation2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductLocation(ctx context.Context, v interface{}) (*model.CreateProductLocation, error) {
+	res, err := ec.unmarshalInputCreateProductLocation(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductPrice(ctx context.Context, v interface{}) (model.CreateProductPrice, error) {
+	res, err := ec.unmarshalInputCreateProductPrice(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateProductPrice2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateProductPrice(ctx context.Context, v interface{}) (*model.CreateProductPrice, error) {
+	res, err := ec.unmarshalInputCreateProductPrice(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateTodo2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐCreateTodo(ctx context.Context, v interface{}) (model.CreateTodo, error) {
 	res, err := ec.unmarshalInputCreateTodo(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNDeleteProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐDeleteProductLocation(ctx context.Context, v interface{}) (model.DeleteProductLocation, error) {
+	res, err := ec.unmarshalInputDeleteProductLocation(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNDeleteProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐDeleteProductPrice(ctx context.Context, v interface{}) (model.DeleteProductPrice, error) {
+	res, err := ec.unmarshalInputDeleteProductPrice(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloat(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNID2uint64(ctx context.Context, v interface{}) (uint64, error) {
@@ -7256,8 +8793,46 @@ func (ec *executionContext) marshalNOrderState2ᚖgitlabᚗcomᚋtriveryᚑidᚋ
 	return ec._OrderState(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProduct2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v model.Product) graphql.Marshaler {
+	return ec._Product(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProduct2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProduct(ctx context.Context, sel ast.SelectionSet, v *model.Product) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Product(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocation(ctx context.Context, sel ast.SelectionSet, v model.ProductLocation) graphql.Marshaler {
 	return ec._ProductLocation(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductLocation2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocation(ctx context.Context, sel ast.SelectionSet, v *model.ProductLocation) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProductLocation(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPrice(ctx context.Context, sel ast.SelectionSet, v model.ProductPrice) graphql.Marshaler {
+	return ec._ProductPrice(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProductPrice2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPrice(ctx context.Context, sel ast.SelectionSet, v *model.ProductPrice) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProductPrice(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRegisterUser2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐRegisterUser(ctx context.Context, v interface{}) (model.RegisterUser, error) {
@@ -7278,6 +8853,42 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -7366,6 +8977,16 @@ func (ec *executionContext) marshalNUint642uint64(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateProductLocation(ctx context.Context, v interface{}) (model.UpdateProductLocation, error) {
+	res, err := ec.unmarshalInputUpdateProductLocation(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateProductPrice(ctx context.Context, v interface{}) (model.UpdateProductPrice, error) {
+	res, err := ec.unmarshalInputUpdateProductPrice(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUpdateUser2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateUser(ctx context.Context, v interface{}) (model.UpdateUser, error) {
@@ -7750,11 +9371,73 @@ func (ec *executionContext) marshalOID2ᚖuint64(ctx context.Context, sel ast.Se
 	return graphql.MarshalUint64(*v)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*v)
+}
+
 func (ec *executionContext) marshalOOrderReview2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderReview(ctx context.Context, sel ast.SelectionSet, v *model.OrderReview) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._OrderReview(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOProduct2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Product) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProduct2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProduct(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOProductLocation2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocationᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ProductLocation) graphql.Marshaler {
@@ -7785,6 +9468,53 @@ func (ec *executionContext) marshalOProductLocation2ᚕgitlabᚗcomᚋtriveryᚑ
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductLocation(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOProductPrice2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPriceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ProductPrice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProductPrice2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐProductPrice(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7883,6 +9613,21 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 		return graphql.Null
 	}
 	return graphql.MarshalTime(*v)
+}
+
+func (ec *executionContext) unmarshalOUint642ᚖuint64(ctx context.Context, v interface{}) (*uint64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUint64(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUint642ᚖuint64(ctx context.Context, sel ast.SelectionSet, v *uint64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalUint64(*v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

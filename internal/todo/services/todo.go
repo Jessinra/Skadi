@@ -9,7 +9,7 @@ import (
 
 type TodoService struct {
 	todos  []domain.Todo
-	lastID uint64
+	currID uint64
 }
 
 var Service = &TodoService{
@@ -17,9 +17,9 @@ var Service = &TodoService{
 }
 
 func (svc *TodoService) CreateNewTodo(_ context.Context, in CreateNewTodoInput) (*domain.Todo, error) {
-	svc.lastID++
+	svc.currID++
 	todo := domain.Todo{
-		ID:          svc.lastID,
+		ID:          svc.currID,
 		CreatedAt:   time.Now(),
 		Text:        in.Text,
 		UserID:      in.UserID,

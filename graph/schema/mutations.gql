@@ -9,5 +9,15 @@ type Mutation {
     updateUser(input: UpdateUser!): User!
     updateUserPassword(input: UpdateUserPassword!): Boolean!
 
+    createProduct(input: CreateProduct!): Product!
+
+    createProductLocation(input: CreateProductLocation!): ProductLocation!
+    updateProductLocation(input: UpdateProductLocation!): ProductLocation!
+    deleteProductLocation(input: DeleteProductLocation!): Boolean!
+
+    createProductPrice(input: CreateProductPrice!): ProductPrice!
+    updateProductPrice(input: UpdateProductPrice!): ProductPrice!
+    deleteProductPrice(input: DeleteProductPrice!): Boolean!
+
     createTodo(input: CreateTodo!): Todo!
 }

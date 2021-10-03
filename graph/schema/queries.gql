@@ -5,5 +5,8 @@
 type Query {
 	user(id: ID!): User!
 
+	product(id: ID!): Product!
+	products(limit: Int, offset: Int): [Product!]
+
 	getTodos(userID: ID): [Todo!]!
 }

@@ -2,39 +2,46 @@
 type Product {
     id: ID!
     createdAt: Time!
-    deletedAt: Time
 
     name: String!
-    description: String
+    description: String!
     imagesURLs: [String!]
-    locations: [ProductLocation!]  
-    price: Uint64!            
-    priceEstimated: Boolean!
-    weight: String
-    dimensions: String
-
-    countries: String!
+    weight: String!
+    dimensions: String!
     categories: [String!]
+
+    locations: [ProductLocation!]  
+    prices: [ProductPrice!]
 }
 
 type ProductLocation {
     id: ID!
     createdAt: Time!
-    deletedAt: Time
 
     userID: ID!
     productID: ID!
     
     text: String!
-
     country: String!
     province: String!
     city: String!
-    area: String
-    street: String
-    building: String
-    store: String
+    area: String!
+    street: String!
+    building: String!
+    store: String!
 
-    longitude: Float
-    latitude: Float    
+    longitude: Float!
+    latitude: Float!
+}
+
+type ProductPrice {
+    id: ID!
+    createdAt: Time!
+
+    userID: ID!
+    productID: ID!
+    
+    currency: String!
+    price: Uint64!
+    isPriceEstimated: Boolean!
 }

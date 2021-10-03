@@ -1,0 +1,66 @@
+
+input CreateProduct{
+    name: String!
+    description: String!
+    imagesURLs: [String!]!
+    weight: String
+    dimensions: String
+    categories: [String!]!
+
+    location: CreateProductLocation!
+    price: CreateProductPrice!
+}
+
+input CreateProductLocation{
+    productID: ID
+    
+    text: String!
+    country: String!
+    province: String!
+    city: String!
+    area: String
+    street: String
+    building: String
+    store: String
+    
+    longitude: Float
+    latitude: Float   
+}
+
+input UpdateProductLocation{
+    id: ID!
+    
+    text: String
+    country: String
+    province: String
+    city: String
+    area: String
+    street: String
+    building: String
+    store: String
+    
+    longitude: Float
+    latitude: Float   
+}
+
+input DeleteProductLocation{
+    id: ID!
+}
+
+input CreateProductPrice{
+    productID: ID
+
+    currency: String!
+    price: Uint64!
+    isPriceEstimated: Boolean!
+}
+
+input UpdateProductPrice{
+    id: ID!
+    price: Uint64
+    isPriceEstimated: Boolean
+}
+
+input DeleteProductPrice{
+    id: ID!
+}

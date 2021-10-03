@@ -10,12 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	errAddUser    = "failed to add new user to database"
-	errUpdateUser = "failed to update user in database"
-	errFindUser   = "failed to find user in database"
-)
-
 type UserRepository struct {
 	DB *gorm.DB
 }
@@ -25,6 +19,12 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 		DB: db,
 	}
 }
+
+var (
+	errAddUser    = "failed to add new user to database"
+	errUpdateUser = "failed to update user in database"
+	errFindUser   = "failed to find user in database"
+)
 
 func (r *UserRepository) Add(ctx context.Context, user *domain.User) error {
 	log := logger.GetLoggerWithCtx(ctx).With(

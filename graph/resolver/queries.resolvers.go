@@ -9,6 +9,7 @@ import (
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
+	productSvc "gitlab.com/trivery-id/skadi/internal/product/services"
 )
 
 func (r *queryResolver) User(ctx context.Context, id uint64) (*model.User, error) {
@@ -18,6 +19,27 @@ func (r *queryResolver) User(ctx context.Context, id uint64) (*model.User, error
 	}
 
 	return model.NewUser(user), nil
+}
+
+func (r *queryResolver) Product(ctx context.Context, id uint64) (*model.Product, error) {
+	product, err := productService.GetProduct(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewProduct(product), nil
+}
+
+func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) ([]model.Product, error) {
+	products, err := productService.GetAllProducts(ctx, productSvc.GetAllProductsInput{
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewNewProducts(products), nil
 }
 
 func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {
