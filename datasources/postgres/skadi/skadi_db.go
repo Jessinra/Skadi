@@ -6,6 +6,7 @@ import (
 
 	"gitlab.com/trivery-id/skadi/external/db"
 	"gitlab.com/trivery-id/skadi/external/db/postgres"
+	productDomain "gitlab.com/trivery-id/skadi/internal/product/domain"
 	userDomain "gitlab.com/trivery-id/skadi/internal/user/domain"
 	"gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/logger"
@@ -33,6 +34,9 @@ func InitMigration() error {
 	logger.Info("skadi database started migration!")
 
 	if err := DB.AutoMigrate(
+		&productDomain.Product{},
+		&productDomain.ProductLocation{},
+		&productDomain.ProductPrice{},
 		&userDomain.User{},
 	); err != nil {
 		logger.Error("failed migrate skadi db tables", err)

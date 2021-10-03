@@ -16,3 +16,6 @@ utils/**/*.test
 
 # whitelist for skadi
 !datasources/**
+
+# ignore test env values
+.env.test

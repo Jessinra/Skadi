@@ -37,5 +37,9 @@ func GetUserFromContext(ctx context.Context) *User {
 		return &user
 	}
 
-	return nil
+	// TODO: remove this
+	return &User{
+		ID:   1001,
+		Name: "dummy",
+	}
 }

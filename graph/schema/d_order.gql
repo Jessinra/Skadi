@@ -21,7 +21,8 @@ type OrderPricing {
     orderID: ID!
     currency: String!
     price: Uint64!
-    priceEstimated: Uint64!
+    priceMax: Uint64!
+    isEstimated: Boolean!
     commission: Int!
 }
 

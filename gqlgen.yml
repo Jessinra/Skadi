@@ -74,3 +74,10 @@ models:
     fields:
       addresses:
         resolver: true
+
+  CreateProduct:
+    fields:
+      location:
+        resolver: true
+      price:
+        resolver: true

@@ -23,10 +23,50 @@ type Address struct {
 	Latitude    *float64   `json:"latitude"`
 }
 
+type CreateProduct struct {
+	Name        string                 `json:"name"`
+	Description string                 `json:"description"`
+	ImagesURLs  []string               `json:"imagesURLs"`
+	Weight      *string                `json:"weight"`
+	Dimensions  *string                `json:"dimensions"`
+	Categories  []string               `json:"categories"`
+	Location    *CreateProductLocation `json:"location"`
+	Price       *CreateProductPrice    `json:"price"`
+}
+
+type CreateProductLocation struct {
+	ProductID *uint64  `json:"productID"`
+	Text      string   `json:"text"`
+	Country   string   `json:"country"`
+	Province  string   `json:"province"`
+	City      string   `json:"city"`
+	Area      *string  `json:"area"`
+	Street    *string  `json:"street"`
+	Building  *string  `json:"building"`
+	Store     *string  `json:"store"`
+	Longitude *float64 `json:"longitude"`
+	Latitude  *float64 `json:"latitude"`
+}
+
+type CreateProductPrice struct {
+	ProductID        *uint64 `json:"productID"`
+	Currency         string  `json:"currency"`
+	Price            uint64  `json:"price"`
+	IsPriceEstimated bool    `json:"isPriceEstimated"`
+}
+
 type CreateTodo struct {
 	Text        string  `json:"text"`
 	Description *string `json:"description"`
 	UserID      uint64  `json:"userID"`
+}
+
+type DeleteProductLocation struct {
+	ID uint64 `json:"id"`
+}
+
+type DeleteProductPrice struct {
+	ID uint64 `json:"id"`
 }
 
 type Order struct {
@@ -53,11 +93,12 @@ type OrderDeal struct {
 }
 
 type OrderPricing struct {
-	OrderID        uint64 `json:"orderID"`
-	Currency       string `json:"currency"`
-	Price          uint64 `json:"price"`
-	PriceEstimated uint64 `json:"priceEstimated"`
-	Commission     int    `json:"commission"`
+	OrderID     uint64 `json:"orderID"`
+	Currency    string `json:"currency"`
+	Price       uint64 `json:"price"`
+	PriceMax    uint64 `json:"priceMax"`
+	IsEstimated bool   `json:"isEstimated"`
+	Commission  int    `json:"commission"`
 }
 
 type OrderReview struct {
@@ -83,37 +124,43 @@ type OrderState struct {
 }
 
 type Product struct {
-	ID             uint64            `json:"id"`
-	CreatedAt      time.Time         `json:"createdAt"`
-	DeletedAt      *time.Time        `json:"deletedAt"`
-	Name           string            `json:"name"`
-	Description    *string           `json:"description"`
-	ImagesURLs     []string          `json:"imagesURLs"`
-	Locations      []ProductLocation `json:"locations"`
-	Price          uint64            `json:"price"`
-	PriceEstimated bool              `json:"priceEstimated"`
-	Weight         *string           `json:"weight"`
-	Dimensions     *string           `json:"dimensions"`
-	Countries      string            `json:"countries"`
-	Categories     []string          `json:"categories"`
+	ID          uint64            `json:"id"`
+	CreatedAt   time.Time         `json:"createdAt"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	ImagesURLs  []string          `json:"imagesURLs"`
+	Weight      string            `json:"weight"`
+	Dimensions  string            `json:"dimensions"`
+	Categories  []string          `json:"categories"`
+	Locations   []ProductLocation `json:"locations"`
+	Prices      []ProductPrice    `json:"prices"`
 }
 
 type ProductLocation struct {
-	ID        uint64     `json:"id"`
-	CreatedAt time.Time  `json:"createdAt"`
-	DeletedAt *time.Time `json:"deletedAt"`
-	UserID    uint64     `json:"userID"`
-	ProductID uint64     `json:"productID"`
-	Text      string     `json:"text"`
-	Country   string     `json:"country"`
-	Province  string     `json:"province"`
-	City      string     `json:"city"`
-	Area      *string    `json:"area"`
-	Street    *string    `json:"street"`
-	Building  *string    `json:"building"`
-	Store     *string    `json:"store"`
-	Longitude *float64   `json:"longitude"`
-	Latitude  *float64   `json:"latitude"`
+	ID        uint64    `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UserID    uint64    `json:"userID"`
+	ProductID uint64    `json:"productID"`
+	Text      string    `json:"text"`
+	Country   string    `json:"country"`
+	Province  string    `json:"province"`
+	City      string    `json:"city"`
+	Area      string    `json:"area"`
+	Street    string    `json:"street"`
+	Building  string    `json:"building"`
+	Store     string    `json:"store"`
+	Longitude float64   `json:"longitude"`
+	Latitude  float64   `json:"latitude"`
+}
+
+type ProductPrice struct {
+	ID               uint64    `json:"id"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UserID           uint64    `json:"userID"`
+	ProductID        uint64    `json:"productID"`
+	Currency         string    `json:"currency"`
+	Price            uint64    `json:"price"`
+	IsPriceEstimated bool      `json:"isPriceEstimated"`
 }
 
 type RegisterUser struct {
@@ -129,6 +176,26 @@ type Todo struct {
 	Description *string   `json:"description"`
 	Done        bool      `json:"done"`
 	UserID      uint64    `json:"userID"`
+}
+
+type UpdateProductLocation struct {
+	ID        uint64   `json:"id"`
+	Text      *string  `json:"text"`
+	Country   *string  `json:"country"`
+	Province  *string  `json:"province"`
+	City      *string  `json:"city"`
+	Area      *string  `json:"area"`
+	Street    *string  `json:"street"`
+	Building  *string  `json:"building"`
+	Store     *string  `json:"store"`
+	Longitude *float64 `json:"longitude"`
+	Latitude  *float64 `json:"latitude"`
+}
+
+type UpdateProductPrice struct {
+	ID               uint64  `json:"id"`
+	Price            *uint64 `json:"price"`
+	IsPriceEstimated *bool   `json:"isPriceEstimated"`
 }
 
 type UpdateUser struct {
