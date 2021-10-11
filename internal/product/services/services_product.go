@@ -1,6 +1,7 @@
 //go:generate mockgen --build_flags=--mod=mod -destination=mocks/IProductRepository.go -package=mocks . IProductRepository
 //go:generate mockgen --build_flags=--mod=mod -destination=mocks/IProductLocationRepository.go -package=mocks . IProductLocationRepository
 //go:generate mockgen --build_flags=--mod=mod -destination=mocks/IProductPriceRepository.go -package=mocks . IProductPriceRepository
+//go:generate mockgen --build_flags=--mod=mod -destination=mocks/IOrderRepository.go -package=mocks . IOrderRepository
 
 package services
 
@@ -17,6 +18,7 @@ type ProductService struct {
 	ProductRepository         IProductRepository
 	ProductPriceRepository    IProductPriceRepository
 	ProductLocationRepository IProductLocationRepository
+	OrderRepository           IOrderRepository
 }
 
 type IProductRepository interface {
@@ -39,11 +41,20 @@ type IProductLocationRepository interface {
 	Delete(ctx context.Context, locationID uint64) error
 }
 
+type IOrderRepository interface {
+	Add(ctx context.Context, order *domain.Order) error
+	Update(ctx context.Context, order *domain.Order) error
+	Find(ctx context.Context, orderID uint64) (*domain.Order, error)
+	FindAllByUserID(ctx context.Context, userID uint64, in repositories.FindAllInput) ([]domain.Order, error)
+	Delete(ctx context.Context, orderID uint64) error
+}
+
 func NewProductService() (*ProductService, error) {
 	return &ProductService{
 		ProductRepository:         repositories.NewProductRepository(skadipsql.DB),
 		ProductPriceRepository:    repositories.NewProductPriceRepository(skadipsql.DB),
 		ProductLocationRepository: repositories.NewProductLocationRepository(skadipsql.DB),
+		OrderRepository:           repositories.NewOrderRepository(skadipsql.DB),
 	}, nil
 }
 
