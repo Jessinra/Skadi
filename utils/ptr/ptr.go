@@ -1,5 +1,7 @@
 package ptr
 
+import "time"
+
 // helper package to return pointer representation of a data type
 
 func String(s string) *string {
@@ -16,4 +18,8 @@ func Uint64(i uint64) *uint64 {
 
 func Float64(f float64) *float64 {
 	return &f
+}
+
+func Time(t time.Time) *time.Time {
+	return &t
 }

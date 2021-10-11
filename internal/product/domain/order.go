@@ -1,6 +1,14 @@
 package domain
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	"gitlab.com/trivery-id/skadi/internal/product/enums"
+	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/ptr"
+	"gitlab.com/trivery-id/skadi/utils/validation"
+)
 
 type Order struct {
 	BaseModel
@@ -15,14 +23,48 @@ type Order struct {
 	Notes    string
 
 	PriceID uint64
-	Price   ProductPrice `gorm:"foreignKey:PriceID"`
+	Price   ProductPrice `gorm:"->;foreignKey:PriceID"`
 
 	Deal  OrderDeal  `gorm:"embedded"`
 	State OrderState `gorm:"embedded"`
+
+	Cancellation []OrderCancellation `gorm:"foreignKey:OrderID"`
 }
 
 func (Order) TableName() string {
 	return "orders"
+}
+
+func (o *Order) AcceptedBy(userID uint64) error {
+	if o.RequesterID == userID {
+		return errors.NewBadRequestError("its your own order")
+	}
+
+	o.ShopperID = userID
+	o.State.LastState = enums.StateAccepted
+	o.State.TimeOrderAccepted = ptr.Time(time.Now())
+	return nil
+}
+
+func (o *Order) Drop(userID uint64, reason string) error {
+	if o.ShopperID != userID {
+		return errors.NewBadRequestError("you are not the shopper")
+	}
+
+	o.ShopperID = 0
+	o.State = NewOrderState()
+	o.Cancellation = append(o.Cancellation, OrderCancellation{
+		OrderID:   o.ID,
+		ShopperID: o.ShopperID,
+		Reason:    reason,
+	})
+
+	return nil
+}
+
+func (o *Order) IsDeletable() bool {
+	return o.State.LastState == enums.StateCreated ||
+		o.State.LastState == enums.StateAccepted
 }
 
 type OrderDeal struct {
@@ -32,13 +74,41 @@ type OrderDeal struct {
 	IncludeBox bool
 }
 
+func (d *OrderDeal) Validate() error {
+	if err := validation.ValidateStruct(d,
+		validation.Field(&d.Location, validation.Required),
+		validation.Field(&d.Date, validation.Required),
+		validation.Field(&d.Method, validation.Required),
+	); err != nil {
+		errMsg := strings.ReplaceAll(err.Error(), ".", "")
+		return errors.NewUnprocessableEntityError(errMsg)
+	}
+
+	return nil
+}
+
+func NewOrderState() OrderState {
+	return OrderState{
+		LastState:        enums.StateCreated,
+		TimeOrderCreated: ptr.Time(time.Now()),
+	}
+}
+
 type OrderState struct {
 	LastState string
 
-	TimeOrderCreated   time.Time
-	TimeOrderAccepted  time.Time
-	TimeOrderOnTheWay  time.Time
-	TimeOrderDelivered time.Time
-	TimeOrderReviewed  time.Time
-	TimeOrderCompleted time.Time
+	TimeOrderCreated   *time.Time
+	TimeOrderAccepted  *time.Time
+	TimeOrderPurchased *time.Time
+	TimeOrderOnTheWay  *time.Time
+	TimeOrderDelivered *time.Time
+	TimeOrderReviewed  *time.Time
+	TimeOrderCompleted *time.Time
+}
+
+type OrderCancellation struct {
+	ID        uint64
+	OrderID   uint64
+	ShopperID uint64
+	Reason    string
 }
