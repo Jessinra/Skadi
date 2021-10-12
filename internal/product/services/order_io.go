@@ -2,14 +2,13 @@ package services
 
 import (
 	"strings"
+	"time"
 
-	"gitlab.com/trivery-id/skadi/internal/product/domain"
 	"gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/validation"
 )
 
 type CreateNewOrderInput struct {
-	UserID    uint64
 	ProductID uint64
 	PriceID   uint64
 
@@ -17,12 +16,18 @@ type CreateNewOrderInput struct {
 	Unit     string
 	Notes    string
 
-	Deal domain.OrderDeal
+	Deal CreateNewOrderDealInput
+}
+
+type CreateNewOrderDealInput struct {
+	Location   interface{}
+	Time       time.Time
+	Method     string
+	IncludeBox bool
 }
 
 func (in *CreateNewOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
 		validation.Field(&in.ProductID, validation.Required),
 		validation.Field(&in.PriceID, validation.Required),
 		validation.Field(&in.Quantity, validation.Required),
@@ -37,13 +42,11 @@ func (in *CreateNewOrderInput) Validate() error {
 }
 
 type TakeOrderInput struct {
-	UserID  uint64
 	OrderID uint64
 }
 
 func (in *TakeOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
 		validation.Field(&in.OrderID, validation.Required),
 	); err != nil {
 		errMsg := strings.ReplaceAll(err.Error(), ".", "")
@@ -54,14 +57,12 @@ func (in *TakeOrderInput) Validate() error {
 }
 
 type DropOrderInput struct {
-	UserID  uint64
 	OrderID uint64
 	Reason  string
 }
 
 func (in *DropOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
 		validation.Field(&in.OrderID, validation.Required),
 		validation.Field(&in.Reason, validation.Length(50, 400)), // nolint
 	); err != nil {
@@ -73,13 +74,11 @@ func (in *DropOrderInput) Validate() error {
 }
 
 type GetOrderInput struct {
-	UserID  uint64
 	OrderID uint64
 }
 
 func (in *GetOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
 		validation.Field(&in.OrderID, validation.Required),
 	); err != nil {
 		errMsg := strings.ReplaceAll(err.Error(), ".", "")
@@ -90,30 +89,20 @@ func (in *GetOrderInput) Validate() error {
 }
 
 type GetAllOrdersInput struct {
-	UserID uint64
 	Limit  *int
 	Offset *int
 }
 
 func (in *GetAllOrdersInput) Validate() error {
-	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
-	); err != nil {
-		errMsg := strings.ReplaceAll(err.Error(), ".", "")
-		return errors.NewBadRequestError(errMsg)
-	}
-
 	return nil
 }
 
 type DeleteOrderInput struct {
-	UserID  uint64
 	OrderID uint64
 }
 
 func (in *DeleteOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
-		validation.Field(&in.UserID, validation.Required),
 		validation.Field(&in.OrderID, validation.Required),
 	); err != nil {
 		errMsg := strings.ReplaceAll(err.Error(), ".", "")

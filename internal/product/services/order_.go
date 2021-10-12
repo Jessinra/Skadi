@@ -6,15 +6,18 @@ import (
 	"gitlab.com/trivery-id/skadi/internal/product/domain"
 	"gitlab.com/trivery-id/skadi/internal/product/repositories"
 	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
 func (svc *ProductService) CreateNewOrder(ctx context.Context, in CreateNewOrderInput) (*domain.Order, error) {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}
 
 	order := &domain.Order{
-		RequesterID: in.UserID,
+		RequesterID: user.ID,
 		ProductID:   in.ProductID,
 		PriceID:     in.PriceID,
 
@@ -22,7 +25,12 @@ func (svc *ProductService) CreateNewOrder(ctx context.Context, in CreateNewOrder
 		Unit:     in.Unit,
 		Notes:    in.Notes,
 
-		Deal:  in.Deal,
+		Deal: domain.OrderDeal{
+			Location:   in.Deal.Location,
+			Time:       in.Deal.Time,
+			Method:     in.Deal.Method,
+			IncludeBox: in.Deal.IncludeBox,
+		},
 		State: domain.NewOrderState(),
 	}
 	if err := svc.OrderRepository.Add(ctx, order); err != nil {
@@ -33,6 +41,8 @@ func (svc *ProductService) CreateNewOrder(ctx context.Context, in CreateNewOrder
 }
 
 func (svc *ProductService) TakeOrder(ctx context.Context, in TakeOrderInput) error {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return err
 	}
@@ -43,7 +53,7 @@ func (svc *ProductService) TakeOrder(ctx context.Context, in TakeOrderInput) err
 	}
 
 	// TODO: implement mutex
-	if err := order.AcceptedBy(in.UserID); err != nil {
+	if err := order.AcceptedBy(user.ID); err != nil {
 		return err
 	}
 
@@ -51,6 +61,8 @@ func (svc *ProductService) TakeOrder(ctx context.Context, in TakeOrderInput) err
 }
 
 func (svc *ProductService) DropOrder(ctx context.Context, in DropOrderInput) error {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return err
 	}
@@ -60,7 +72,7 @@ func (svc *ProductService) DropOrder(ctx context.Context, in DropOrderInput) err
 		return err
 	}
 
-	if err := order.Drop(in.UserID, in.Reason); err != nil {
+	if err := order.Drop(user.ID, in.Reason); err != nil {
 		return err
 	}
 
@@ -68,6 +80,8 @@ func (svc *ProductService) DropOrder(ctx context.Context, in DropOrderInput) err
 }
 
 func (svc *ProductService) GetOrder(ctx context.Context, in GetOrderInput) (*domain.Order, error) {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}
@@ -77,7 +91,7 @@ func (svc *ProductService) GetOrder(ctx context.Context, in GetOrderInput) (*dom
 		return nil, err
 	}
 
-	if order.RequesterID != in.UserID || order.ShopperID != in.UserID {
+	if order.RequesterID != user.ID || order.ShopperID != user.ID {
 		return nil, errors.NewForbiddenError("not your order")
 	}
 
@@ -85,17 +99,21 @@ func (svc *ProductService) GetOrder(ctx context.Context, in GetOrderInput) (*dom
 }
 
 func (svc *ProductService) GetAllOrders(ctx context.Context, in GetAllOrdersInput) ([]domain.Order, error) {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return nil, err
 	}
 
-	return svc.OrderRepository.FindAllByUserID(ctx, in.UserID, repositories.FindAllInput{
+	return svc.OrderRepository.FindAllByUserID(ctx, user.ID, repositories.FindAllInput{
 		Limit:  in.Limit,
 		Offset: in.Offset,
 	})
 }
 
 func (svc *ProductService) DeleteOrder(ctx context.Context, in DeleteOrderInput) error {
+	user := metadata.GetUserFromContext(ctx)
+
 	if err := in.Validate(); err != nil {
 		return err
 	}
@@ -105,7 +123,7 @@ func (svc *ProductService) DeleteOrder(ctx context.Context, in DeleteOrderInput)
 		return err
 	}
 
-	if order.ShopperID != in.UserID {
+	if order.ShopperID != user.ID {
 		return errors.NewForbiddenError("not your order")
 	}
 	if !order.IsDeletable() {

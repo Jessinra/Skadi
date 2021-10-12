@@ -6,7 +6,6 @@ package resolver
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
@@ -40,15 +39,30 @@ func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) (
 		return nil, err
 	}
 
-	return model.NewNewProducts(products), nil
+	return model.NewProducts(products), nil
 }
 
 func (r *queryResolver) Order(ctx context.Context, id uint64) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented"))
+	order, err := productService.GetOrder(ctx, productSvc.GetOrderInput{
+		OrderID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewOrder(order), nil
 }
 
 func (r *queryResolver) Orders(ctx context.Context, userID uint64, limit *int, offset *int) ([]model.Order, error) {
-	panic(fmt.Errorf("not implemented"))
+	orders, err := productService.GetAllOrders(ctx, productSvc.GetAllOrdersInput{
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewOrders(orders), nil
 }
 
 func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {

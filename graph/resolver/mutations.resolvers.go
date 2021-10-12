@@ -5,7 +5,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
@@ -173,19 +172,67 @@ func (r *mutationResolver) DeleteProductPrice(ctx context.Context, input model.D
 }
 
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.CreateOrder) (*model.Order, error) {
-	panic(fmt.Errorf("not implemented"))
+	if input.Product == nil {
+		product, err := r.CreateProduct(ctx, *input.Product)
+		if err != nil {
+			return nil, err
+		}
+
+		input.ProductID = &product.ID
+		input.PriceID = &product.Prices[0].ID
+	}
+
+	order, err := productService.CreateNewOrder(ctx, productSvc.CreateNewOrderInput{
+		ProductID: *input.ProductID,
+		PriceID:   *input.PriceID,
+		Quantity:  input.Quantity,
+		Unit:      input.Unit,
+		Notes:     input.Notes,
+		Deal: productSvc.CreateNewOrderDealInput{
+			Location:   input.Deal.Location,
+			Time:       input.Deal.Time,
+			Method:     input.Deal.Method,
+			IncludeBox: input.Deal.IncludeBox,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewOrder(order), nil
 }
 
 func (r *mutationResolver) TakeOrder(ctx context.Context, input model.TakeOrder) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	err := productService.TakeOrder(ctx, productSvc.TakeOrderInput{
+		OrderID: input.ID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	err := productService.DropOrder(ctx, productSvc.DropOrderInput{
+		OrderID: input.ID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) DeleteOrder(ctx context.Context, input model.DeleteOrder) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	err := productService.DeleteOrder(ctx, productSvc.DeleteOrderInput{
+		OrderID: input.ID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error) {

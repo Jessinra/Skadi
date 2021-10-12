@@ -21,7 +21,7 @@ func NewProduct(in *domain.Product) *Product {
 	}
 }
 
-func NewNewProducts(in []domain.Product) []Product {
+func NewProducts(in []domain.Product) []Product {
 	out := []Product{}
 	for i := range in {
 		out = append(out, *NewProduct(&in[i]))
