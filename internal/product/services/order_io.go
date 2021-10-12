@@ -93,10 +93,6 @@ type GetAllOrdersInput struct {
 	Offset *int
 }
 
-func (in *GetAllOrdersInput) Validate() error {
-	return nil
-}
-
 type DeleteOrderInput struct {
 	OrderID uint64
 }

@@ -100,11 +100,6 @@ func (svc *ProductService) GetOrder(ctx context.Context, in GetOrderInput) (*dom
 
 func (svc *ProductService) GetAllOrders(ctx context.Context, in GetAllOrdersInput) ([]domain.Order, error) {
 	user := metadata.GetUserFromContext(ctx)
-
-	if err := in.Validate(); err != nil {
-		return nil, err
-	}
-
 	return svc.OrderRepository.FindAllByUserID(ctx, user.ID, repositories.FindAllInput{
 		Limit:  in.Limit,
 		Offset: in.Offset,
