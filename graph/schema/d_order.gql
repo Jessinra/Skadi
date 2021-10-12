@@ -2,7 +2,7 @@
 type Order {
     id: ID!
     requester: User!
-    shopeer: User
+    shopper: User
     product: Product!
 
     quantity: Int!

@@ -10,7 +10,7 @@ func NewOrder(in *domain.Order) *Order {
 	return &Order{
 		ID:           in.ID,
 		Requester:    &User{},
-		Shopeer:      &User{},
+		Shopper:      &User{},
 		Product:      &Product{},
 		Quantity:     in.Quantity,
 		Unit:         in.Unit,

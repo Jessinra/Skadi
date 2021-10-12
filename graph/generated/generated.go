@@ -89,7 +89,7 @@ type ComplexityRoot struct {
 		Product      func(childComplexity int) int
 		Quantity     func(childComplexity int) int
 		Requester    func(childComplexity int) int
-		Shopeer      func(childComplexity int) int
+		Shopper      func(childComplexity int) int
 		State        func(childComplexity int) int
 		Unit         func(childComplexity int) int
 	}
@@ -566,12 +566,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.Requester(childComplexity), true
 
-	case "Order.shopeer":
-		if e.complexity.Order.Shopeer == nil {
+	case "Order.shopper":
+		if e.complexity.Order.Shopper == nil {
 			break
 		}
 
-		return e.complexity.Order.Shopeer(childComplexity), true
+		return e.complexity.Order.Shopper(childComplexity), true
 
 	case "Order.state":
 		if e.complexity.Order.State == nil {
@@ -1168,7 +1168,7 @@ type Address {
 type Order {
     id: ID!
     requester: User!
-    shopeer: User
+    shopper: User
     product: Product!
 
     quantity: Int!
@@ -3021,7 +3021,7 @@ func (ec *executionContext) _Order_requester(ctx context.Context, field graphql.
 	return ec.marshalNUser2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Order_shopeer(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+func (ec *executionContext) _Order_shopper(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3039,7 +3039,7 @@ func (ec *executionContext) _Order_shopeer(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Shopeer, nil
+		return obj.Shopper, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7817,8 +7817,8 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "shopeer":
-			out.Values[i] = ec._Order_shopeer(ctx, field, obj)
+		case "shopper":
+			out.Values[i] = ec._Order_shopper(ctx, field, obj)
 		case "product":
 			out.Values[i] = ec._Order_product(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
