@@ -1,0 +1,32 @@
+
+input CreateOrder {
+    product: CreateProduct
+    productID: ID
+    priceID: ID
+    
+    quantity: Int!
+    unit: String!
+    notes: String!
+
+    deal: CreateOrderDeal!
+}
+
+input CreateOrderDeal {
+    location: String!
+    method: String!
+    time: Time!
+    includeBox: Boolean!
+}
+
+input TakeOrder {
+    id: ID!
+}
+
+input DropOrder {
+    id: ID!
+    reason: String!
+}
+
+input DeleteOrder {
+    id: ID!
+}

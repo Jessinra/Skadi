@@ -8,5 +8,8 @@ type Query {
 	product(id: ID!): Product!
 	products(limit: Int, offset: Int): [Product!]
 
+	order(id: ID!): Order!
+	orders(userID: ID!, limit: Int, offset: Int): [Order!]
+
 	getTodos(userID: ID): [Todo!]!
 }

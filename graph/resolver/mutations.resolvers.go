@@ -5,6 +5,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
@@ -169,6 +170,22 @@ func (r *mutationResolver) DeleteProductPrice(ctx context.Context, input model.D
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) CreateOrder(ctx context.Context, input model.CreateOrder) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) TakeOrder(ctx context.Context, input model.TakeOrder) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteOrder(ctx context.Context, input model.DeleteOrder) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error) {

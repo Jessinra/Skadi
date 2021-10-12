@@ -19,5 +19,10 @@ type Mutation {
     updateProductPrice(input: UpdateProductPrice!): ProductPrice!
     deleteProductPrice(input: DeleteProductPrice!): Boolean!
 
+    createOrder(input: CreateOrder!): Order!
+    takeOrder(input: TakeOrder!): Boolean!
+    dropOrder(input: DropOrder!): Boolean!
+    deleteOrder(input: DeleteOrder!): Boolean!
+
     createTodo(input: CreateTodo!): Todo!
 }

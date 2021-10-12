@@ -23,6 +23,23 @@ type Address struct {
 	Latitude    *float64   `json:"latitude"`
 }
 
+type CreateOrder struct {
+	Product   *CreateProduct   `json:"product"`
+	ProductID *uint64          `json:"productID"`
+	PriceID   *uint64          `json:"priceID"`
+	Quantity  int              `json:"quantity"`
+	Unit      string           `json:"unit"`
+	Notes     string           `json:"notes"`
+	Deal      *CreateOrderDeal `json:"deal"`
+}
+
+type CreateOrderDeal struct {
+	Location   string    `json:"location"`
+	Method     string    `json:"method"`
+	Time       time.Time `json:"time"`
+	IncludeBox bool      `json:"includeBox"`
+}
+
 type CreateProduct struct {
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
@@ -61,6 +78,10 @@ type CreateTodo struct {
 	UserID      uint64  `json:"userID"`
 }
 
+type DeleteOrder struct {
+	ID uint64 `json:"id"`
+}
+
 type DeleteProductLocation struct {
 	ID uint64 `json:"id"`
 }
@@ -69,58 +90,46 @@ type DeleteProductPrice struct {
 	ID uint64 `json:"id"`
 }
 
+type DropOrder struct {
+	ID     uint64 `json:"id"`
+	Reason string `json:"reason"`
+}
+
 type Order struct {
-	ID          uint64        `json:"id"`
-	CreatedAt   time.Time     `json:"createdAt"`
-	DeletedAt   *time.Time    `json:"deletedAt"`
-	RequesterID uint64        `json:"requesterID"`
-	ShopeerID   *uint64       `json:"shopeerID"`
-	ProductID   uint64        `json:"productID"`
-	Quantity    int           `json:"quantity"`
-	Notes       *string       `json:"Notes"`
-	Deal        *OrderDeal    `json:"Deal"`
-	Pricing     *OrderPricing `json:"Pricing"`
-	State       *OrderState   `json:"State"`
-	Review      *OrderReview  `json:"Review"`
+	ID           uint64              `json:"id"`
+	Requester    *User               `json:"requester"`
+	Shopeer      *User               `json:"shopeer"`
+	Product      *Product            `json:"product"`
+	Quantity     int                 `json:"quantity"`
+	Unit         string              `json:"unit"`
+	Notes        *string             `json:"notes"`
+	Price        *ProductPrice       `json:"price"`
+	Deal         *OrderDeal          `json:"deal"`
+	State        *OrderState         `json:"state"`
+	Cancellation []OrderCancellation `json:"cancellation"`
+}
+
+type OrderCancellation struct {
+	CreatedAt time.Time `json:"createdAt"`
+	Reason    string    `json:"reason"`
 }
 
 type OrderDeal struct {
-	OrderID    uint64    `json:"orderID"`
+	Location   string    `json:"location"`
 	Method     string    `json:"method"`
-	Location   *Address  `json:"location"`
 	Time       time.Time `json:"time"`
 	IncludeBox bool      `json:"includeBox"`
 }
 
-type OrderPricing struct {
-	OrderID     uint64 `json:"orderID"`
-	Currency    string `json:"currency"`
-	Price       uint64 `json:"price"`
-	PriceMax    uint64 `json:"priceMax"`
-	IsEstimated bool   `json:"isEstimated"`
-	Commission  int    `json:"commission"`
-}
-
-type OrderReview struct {
-	ID          uint64    `json:"id"`
-	CreatedAt   time.Time `json:"createdAt"`
-	OrderID     uint64    `json:"orderID"`
-	RequesterID uint64    `json:"requesterID"`
-	ShopeerID   *uint64   `json:"shopeerID"`
-	Stars       int       `json:"stars"`
-	Notes       *string   `json:"notes"`
-}
-
 type OrderState struct {
-	OrderID            uint64     `json:"orderID"`
-	UpdatedAt          time.Time  `json:"updatedAt"`
 	LastState          string     `json:"lastState"`
-	TimestampAccepted  *time.Time `json:"timestampAccepted"`
-	TimestampPurchased *time.Time `json:"timestampPurchased"`
-	TimestampOnTheWay  *time.Time `json:"timestampOnTheWay"`
-	TimestampDelivered *time.Time `json:"timestampDelivered"`
-	TimestampReviewed  *time.Time `json:"timestampReviewed"`
-	TimestampCompleted *time.Time `json:"timestampCompleted"`
+	TimeOrderCreated   *time.Time `json:"TimeOrderCreated"`
+	TimeOrderAccepted  *time.Time `json:"TimeOrderAccepted"`
+	TimeOrderPurchased *time.Time `json:"TimeOrderPurchased"`
+	TimeOrderOnTheWay  *time.Time `json:"TimeOrderOnTheWay"`
+	TimeOrderDelivered *time.Time `json:"TimeOrderDelivered"`
+	TimeOrderReviewed  *time.Time `json:"TimeOrderReviewed"`
+	TimeOrderCompleted *time.Time `json:"TimeOrderCompleted"`
 }
 
 type Product struct {
@@ -167,6 +176,10 @@ type RegisterUser struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type TakeOrder struct {
+	ID uint64 `json:"id"`
 }
 
 type Todo struct {

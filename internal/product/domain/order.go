@@ -69,7 +69,7 @@ func (o *Order) IsDeletable() bool {
 
 type OrderDeal struct {
 	Location   interface{}
-	Date       time.Time
+	Time       time.Time
 	Method     string
 	IncludeBox bool
 }
@@ -77,7 +77,7 @@ type OrderDeal struct {
 func (d *OrderDeal) Validate() error {
 	if err := validation.ValidateStruct(d,
 		validation.Field(&d.Location, validation.Required),
-		validation.Field(&d.Date, validation.Required),
+		validation.Field(&d.Time, validation.Required),
 		validation.Field(&d.Method, validation.Required),
 	); err != nil {
 		errMsg := strings.ReplaceAll(err.Error(), ".", "")
@@ -107,8 +107,13 @@ type OrderState struct {
 }
 
 type OrderCancellation struct {
+	CreatedAt time.Time
 	ID        uint64
 	OrderID   uint64
 	ShopperID uint64
 	Reason    string
+}
+
+func (OrderCancellation) TableName() string {
+	return "order_cancellations"
 }

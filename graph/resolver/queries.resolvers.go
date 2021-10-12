@@ -6,6 +6,7 @@ package resolver
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
@@ -40,6 +41,14 @@ func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) (
 	}
 
 	return model.NewNewProducts(products), nil
+}
+
+func (r *queryResolver) Order(ctx context.Context, id uint64) (*model.Order, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Orders(ctx context.Context, userID uint64, limit *int, offset *int) ([]model.Order, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {
