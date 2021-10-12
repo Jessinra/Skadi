@@ -97,8 +97,11 @@ type DropOrder struct {
 
 type Order struct {
 	ID           uint64              `json:"id"`
+	RequesterID  uint64              `json:"requesterID"`
 	Requester    *User               `json:"requester"`
+	ShopperID    *uint64             `json:"shopperID"`
 	Shopper      *User               `json:"shopper"`
+	ProductID    uint64              `json:"productID"`
 	Product      *Product            `json:"product"`
 	Quantity     int                 `json:"quantity"`
 	Unit         string              `json:"unit"`

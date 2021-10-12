@@ -74,3 +74,12 @@ models:
     fields:
       addresses:
         resolver: true
+
+  Order:
+    fields:
+      requester:
+        resolver: true
+      shopper:
+        resolver: true
+      product:
+        resolver: true

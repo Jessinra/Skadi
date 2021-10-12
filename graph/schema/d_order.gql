@@ -1,8 +1,12 @@
 
 type Order {
     id: ID!
+
+    requesterID: ID!
     requester: User!
+    shopperID: ID
     shopper: User
+    productID: ID!
     product: Product!
 
     quantity: Int!
