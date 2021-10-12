@@ -17,7 +17,7 @@ type Order {
 
     deal: OrderDeal!
     state: OrderState!
-    cancellation: [OrderCancellation!]
+    cancellations: [OrderCancellation!]
 }
 
 type OrderDeal {

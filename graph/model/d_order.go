@@ -8,15 +8,15 @@ import (
 
 func NewOrder(in *domain.Order) *Order {
 	return &Order{
-		ID:           in.ID,
-		Product:      &Product{},
-		Quantity:     in.Quantity,
-		Unit:         in.Unit,
-		Notes:        &in.Notes,
-		Price:        NewProductPrice(&in.Price),
-		Deal:         NewOrderDeal(&in.Deal),
-		State:        NewOrderState(&in.State),
-		Cancellation: NewOrderCancellations(in.Cancellation),
+		ID:            in.ID,
+		Product:       &Product{},
+		Quantity:      in.Quantity,
+		Unit:          in.Unit,
+		Notes:         &in.Notes,
+		Price:         NewProductPrice(&in.Price),
+		Deal:          NewOrderDeal(&in.Deal),
+		State:         NewOrderState(&in.State),
+		Cancellations: NewOrderCancellations(in.Cancellations),
 	}
 }
 

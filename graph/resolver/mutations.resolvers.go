@@ -172,7 +172,7 @@ func (r *mutationResolver) DeleteProductPrice(ctx context.Context, input model.D
 }
 
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.CreateOrder) (*model.Order, error) {
-	if input.Product == nil {
+	if input.Product != nil {
 		product, err := r.CreateProduct(ctx, *input.Product)
 		if err != nil {
 			return nil, err

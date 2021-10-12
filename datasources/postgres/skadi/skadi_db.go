@@ -37,6 +37,8 @@ func InitMigration() error {
 		&productDomain.Product{},
 		&productDomain.ProductLocation{},
 		&productDomain.ProductPrice{},
+		&productDomain.Order{},
+		&productDomain.OrderCancellation{},
 		&userDomain.User{},
 	); err != nil {
 		logger.Error("failed migrate skadi db tables", err)

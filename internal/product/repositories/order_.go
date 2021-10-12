@@ -33,7 +33,7 @@ func (r *OrderRepository) Add(ctx context.Context, order *domain.Order) error {
 		zap.String("function", "OrderRepository.Add"),
 	)
 
-	if err := r.DB.Create(&order).Error; err != nil {
+	if err := r.DB.Omit("Cancellations").Create(&order).Error; err != nil {
 		log.Error(errAddOrder, zap.Error(err))
 		return NewRepositoryError(errAddOrder, err)
 	}

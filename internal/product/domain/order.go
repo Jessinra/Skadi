@@ -28,7 +28,7 @@ type Order struct {
 	Deal  OrderDeal  `gorm:"embedded"`
 	State OrderState `gorm:"embedded"`
 
-	Cancellation []OrderCancellation `gorm:"foreignKey:OrderID"`
+	Cancellations []OrderCancellation `gorm:"foreignKey:OrderID"`
 }
 
 func (Order) TableName() string {
@@ -53,7 +53,7 @@ func (o *Order) Drop(userID uint64, reason string) error {
 
 	o.ShopperID = 0
 	o.State = NewOrderState()
-	o.Cancellation = append(o.Cancellation, OrderCancellation{
+	o.Cancellations = append(o.Cancellations, OrderCancellation{
 		OrderID:   o.ID,
 		ShopperID: o.ShopperID,
 		Reason:    reason,

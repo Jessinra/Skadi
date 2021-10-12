@@ -96,20 +96,20 @@ type DropOrder struct {
 }
 
 type Order struct {
-	ID           uint64              `json:"id"`
-	RequesterID  uint64              `json:"requesterID"`
-	Requester    *User               `json:"requester"`
-	ShopperID    *uint64             `json:"shopperID"`
-	Shopper      *User               `json:"shopper"`
-	ProductID    uint64              `json:"productID"`
-	Product      *Product            `json:"product"`
-	Quantity     int                 `json:"quantity"`
-	Unit         string              `json:"unit"`
-	Notes        *string             `json:"notes"`
-	Price        *ProductPrice       `json:"price"`
-	Deal         *OrderDeal          `json:"deal"`
-	State        *OrderState         `json:"state"`
-	Cancellation []OrderCancellation `json:"cancellation"`
+	ID            uint64              `json:"id"`
+	RequesterID   uint64              `json:"requesterID"`
+	Requester     *User               `json:"requester"`
+	ShopperID     *uint64             `json:"shopperID"`
+	Shopper       *User               `json:"shopper"`
+	ProductID     uint64              `json:"productID"`
+	Product       *Product            `json:"product"`
+	Quantity      int                 `json:"quantity"`
+	Unit          string              `json:"unit"`
+	Notes         *string             `json:"notes"`
+	Price         *ProductPrice       `json:"price"`
+	Deal          *OrderDeal          `json:"deal"`
+	State         *OrderState         `json:"state"`
+	Cancellations []OrderCancellation `json:"cancellations"`
 }
 
 type OrderCancellation struct {

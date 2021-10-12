@@ -82,20 +82,20 @@ type ComplexityRoot struct {
 	}
 
 	Order struct {
-		Cancellation func(childComplexity int) int
-		Deal         func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Notes        func(childComplexity int) int
-		Price        func(childComplexity int) int
-		Product      func(childComplexity int) int
-		ProductID    func(childComplexity int) int
-		Quantity     func(childComplexity int) int
-		Requester    func(childComplexity int) int
-		RequesterID  func(childComplexity int) int
-		Shopper      func(childComplexity int) int
-		ShopperID    func(childComplexity int) int
-		State        func(childComplexity int) int
-		Unit         func(childComplexity int) int
+		Cancellations func(childComplexity int) int
+		Deal          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Notes         func(childComplexity int) int
+		Price         func(childComplexity int) int
+		Product       func(childComplexity int) int
+		ProductID     func(childComplexity int) int
+		Quantity      func(childComplexity int) int
+		Requester     func(childComplexity int) int
+		RequesterID   func(childComplexity int) int
+		Shopper       func(childComplexity int) int
+		ShopperID     func(childComplexity int) int
+		State         func(childComplexity int) int
+		Unit          func(childComplexity int) int
 	}
 
 	OrderCancellation struct {
@@ -521,12 +521,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUserPassword(childComplexity, args["input"].(model.UpdateUserPassword)), true
 
-	case "Order.cancellation":
-		if e.complexity.Order.Cancellation == nil {
+	case "Order.cancellations":
+		if e.complexity.Order.Cancellations == nil {
 			break
 		}
 
-		return e.complexity.Order.Cancellation(childComplexity), true
+		return e.complexity.Order.Cancellations(childComplexity), true
 
 	case "Order.deal":
 		if e.complexity.Order.Deal == nil {
@@ -1215,7 +1215,7 @@ type Order {
 
     deal: OrderDeal!
     state: OrderState!
-    cancellation: [OrderCancellation!]
+    cancellations: [OrderCancellation!]
 }
 
 type OrderDeal {
@@ -3433,7 +3433,7 @@ func (ec *executionContext) _Order_state(ctx context.Context, field graphql.Coll
 	return ec.marshalNOrderState2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderState(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Order_cancellation(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+func (ec *executionContext) _Order_cancellations(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3451,7 +3451,7 @@ func (ec *executionContext) _Order_cancellation(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Cancellation, nil
+		return obj.Cancellations, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8028,8 +8028,8 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "cancellation":
-			out.Values[i] = ec._Order_cancellation(ctx, field, obj)
+		case "cancellations":
+			out.Values[i] = ec._Order_cancellations(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
