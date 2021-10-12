@@ -33,7 +33,7 @@ func (r *OrderRepository) Add(ctx context.Context, order *domain.Order) error {
 		zap.String("function", "OrderRepository.Add"),
 	)
 
-	if err := r.DB.Omit("Cancellations").Create(&order).Error; err != nil {
+	if err := r.DB.Create(&order).Error; err != nil {
 		log.Error(errAddOrder, zap.Error(err))
 		return NewRepositoryError(errAddOrder, err)
 	}
@@ -65,6 +65,7 @@ func (r *OrderRepository) Find(ctx context.Context, orderID uint64) (*domain.Ord
 	tx := r.DB.
 		Where("id = ?", orderID).
 		Preload("Price").
+		Preload("Cancellations").
 		First(&order)
 
 	if err := tx.Error; err != nil {
@@ -93,6 +94,7 @@ func (r *OrderRepository) FindAllByUserID(ctx context.Context, userID uint64, in
 		Where(in.Where()).
 		Limit(*in.Limit).Offset(*in.Offset).
 		Preload("Price").
+		Preload("Cancellations").
 		Find(&orders)
 
 	if err := tx.Error; err != nil {

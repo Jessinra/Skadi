@@ -20,7 +20,7 @@ type CreateNewOrderInput struct {
 }
 
 type CreateNewOrderDealInput struct {
-	Location   interface{}
+	Location   string
 	Time       time.Time
 	Method     string
 	IncludeBox bool

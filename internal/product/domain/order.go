@@ -68,7 +68,7 @@ func (o *Order) IsDeletable() bool {
 }
 
 type OrderDeal struct {
-	Location   interface{}
+	Location   string // TODO: use address
 	Time       time.Time
 	Method     string
 	IncludeBox bool

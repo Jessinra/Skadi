@@ -9,7 +9,9 @@ import (
 func NewOrder(in *domain.Order) *Order {
 	return &Order{
 		ID:            in.ID,
-		Product:       &Product{},
+		RequesterID:   in.RequesterID,
+		ShopperID:     &in.ShopperID,
+		ProductID:     in.ProductID,
 		Quantity:      in.Quantity,
 		Unit:          in.Unit,
 		Notes:         &in.Notes,

@@ -8,7 +8,6 @@ import (
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
-	"gitlab.com/trivery-id/skadi/utils/ptr"
 )
 
 func (r *orderResolver) Requester(ctx context.Context, obj *model.Order) (*model.User, error) {
@@ -21,7 +20,7 @@ func (r *orderResolver) Requester(ctx context.Context, obj *model.Order) (*model
 }
 
 func (r *orderResolver) Shopper(ctx context.Context, obj *model.Order) (*model.User, error) {
-	if id := obj.ShopperID; id == nil || id == ptr.Uint64(0) {
+	if id := obj.ShopperID; id == nil || *id == 0 {
 		return nil, nil
 	}
 

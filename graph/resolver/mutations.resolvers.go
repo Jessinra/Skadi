@@ -216,6 +216,7 @@ func (r *mutationResolver) TakeOrder(ctx context.Context, input model.TakeOrder)
 func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder) (bool, error) {
 	err := productService.DropOrder(ctx, productSvc.DropOrderInput{
 		OrderID: input.ID,
+		Reason:  input.Reason,
 	})
 	if err != nil {
 		return false, err

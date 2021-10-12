@@ -91,7 +91,7 @@ func (svc *ProductService) GetOrder(ctx context.Context, in GetOrderInput) (*dom
 		return nil, err
 	}
 
-	if order.RequesterID != user.ID || order.ShopperID != user.ID {
+	if order.RequesterID != user.ID && order.ShopperID != user.ID {
 		return nil, errors.NewForbiddenError("not your order")
 	}
 
@@ -118,7 +118,7 @@ func (svc *ProductService) DeleteOrder(ctx context.Context, in DeleteOrderInput)
 		return err
 	}
 
-	if order.ShopperID != user.ID {
+	if order.RequesterID != user.ID {
 		return errors.NewForbiddenError("not your order")
 	}
 	if !order.IsDeletable() {
