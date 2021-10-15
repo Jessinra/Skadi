@@ -14,9 +14,13 @@ var (
 )
 
 type User struct {
-	ID    uint64
-	Name  string
-	Email string
+	ID                uint64
+	Name              string
+	Email             string
+	PhoneNumber       string
+	ProfilePictureURL string
+	CurrencyMain      string
+	CurrencySub       *string
 }
 
 func NewContextWithUUID(ctx context.Context) context.Context {

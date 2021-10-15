@@ -16,6 +16,7 @@ require (
 require (
 	github.com/aws/aws-sdk-go v1.40.53
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/cors v1.3.1
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.2

@@ -7,6 +7,7 @@ import (
 	"gitlab.com/trivery-id/skadi/internal/user/domain"
 	"gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/jwt"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
 var (
@@ -53,14 +54,16 @@ func (svc *UserService) GenerateAuthTokens(ctx context.Context, userID uint64) (
 	}
 
 	userClaims := domain.UserClaims{
-		UserID:                user.ID,
-		UserName:              user.Name,
-		UserEmail:             user.Email,
-		UserPhoneNumber:       user.PhoneNumber,
-		UserProfilePictureURL: user.ProfilePictureURL,
-		CurrencyMain:          user.CurrencyMain,
-		CurrencySub:           user.CurrencySub,
-		StandardClaims:        jwt.NewStandardClaims(jwt.WithExpiresAt(time.Now().Add(defaultTokenExpiration))),
+		User: metadata.User{
+			ID:                user.ID,
+			Name:              user.Name,
+			Email:             user.Email,
+			PhoneNumber:       user.PhoneNumber,
+			ProfilePictureURL: user.ProfilePictureURL,
+			CurrencyMain:      user.CurrencyMain,
+			CurrencySub:       user.CurrencySub,
+		},
+		StandardClaims: jwt.NewStandardClaims(jwt.WithExpiresAt(time.Now().Add(defaultTokenExpiration))),
 	}
 	jwtToken, err := jwt.NewToken(userClaims)
 	if err != nil {

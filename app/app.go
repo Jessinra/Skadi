@@ -11,6 +11,7 @@ import (
 	"gitlab.com/trivery-id/skadi/external/secret-manager/aws"
 	"gitlab.com/trivery-id/skadi/graph/resolver"
 	productServices "gitlab.com/trivery-id/skadi/internal/product/services"
+	userController "gitlab.com/trivery-id/skadi/internal/user/controller"
 	userServices "gitlab.com/trivery-id/skadi/internal/user/services"
 	"gitlab.com/trivery-id/skadi/utils/logger"
 	"gitlab.com/trivery-id/skadi/utils/metadata"
@@ -26,6 +27,9 @@ func StartApplication() {
 	initServices()
 	initServiceDependencies()
 	validateServices()
+
+	initControllers()
+	validateControllers()
 
 	resolver.InitResolvers()
 
@@ -93,8 +97,14 @@ func initServices() {
 func initServiceDependencies() {
 	// sorted alphabetically
 
-	productServices.InitServiceDependencies()
-	userServices.InitServiceDependencies()
+	if err := productServices.InitServiceDependencies(); err != nil {
+		logger.Error("Failed to initialize productServices dependencies", err)
+		panic(fmt.Sprintf("Failed to initialize productServices dependencies: `%+v`", err))
+	}
+	if err := userServices.InitServiceDependencies(); err != nil {
+		logger.Error("Failed to initialize userServices dependencies", err)
+		panic(fmt.Sprintf("Failed to initialize userServices dependencies: `%+v`", err))
+	}
 }
 
 func validateServices() {
@@ -107,6 +117,24 @@ func validateServices() {
 	if err := userServices.ValidateServices(); err != nil {
 		logger.Error("Invalid userServices initialization", err)
 		panic(fmt.Sprintf("Invalid userServices initialization: `%+v`", err))
+	}
+}
+
+func initControllers() {
+	if err := userController.InitControllers(); err != nil {
+		logger.Error("Failed to initialize user controllers", err)
+		panic(fmt.Sprintf("Failed to initialize user controllers: `%+v`", err))
+	}
+
+	AuthController = userController.GetAuthController()
+}
+
+func validateControllers() {
+	// sorted alphabetically
+
+	if err := userController.ValidateControllers(); AuthController == nil || err != nil {
+		logger.Error("Invalid userControllers initialization", err)
+		panic(fmt.Sprintf("Invalid userControllers initialization: `%+v`", err))
 	}
 }
 
