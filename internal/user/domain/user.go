@@ -5,6 +5,7 @@ import (
 
 	"gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/validation"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -46,4 +47,18 @@ func (u *User) Validate() error {
 // BeforeCreate gorm callback before insert into DB.
 func (u *User) BeforeCreate(_ *gorm.DB) error {
 	return u.Validate()
+}
+
+func (u *User) SetPassword(password string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	u.PasswordHashed = string(hash)
+	return nil
+}
+
+func (u *User) ComparePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.PasswordHashed), []byte(password))
 }

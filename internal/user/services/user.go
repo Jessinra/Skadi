@@ -22,10 +22,13 @@ func (svc *UserService) RegisterUser(ctx context.Context, in RegisterUserInput) 
 	}
 
 	user := &domain.User{
-		Name:           in.Name,
-		Email:          in.Email,
-		PasswordHashed: sha.Hash512(in.Password),
+		Name:  in.Name,
+		Email: in.Email,
 	}
+	if err := user.SetPassword(in.Password); err != nil {
+		return nil, err
+	}
+
 	if err := svc.UserRepository.Add(ctx, user); err != nil {
 		return nil, err
 	}
