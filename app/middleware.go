@@ -18,18 +18,6 @@ var errInvalidCredentials = errors.NewUnauthorizedError("invalid credentials")
 
 type middleware func(next gin.HandlerFunc) gin.HandlerFunc
 
-func chainMiddleware(mw ...middleware) middleware {
-	return func(final gin.HandlerFunc) gin.HandlerFunc {
-		return func(c *gin.Context) {
-			last := final
-			for i := len(mw) - 1; i >= 0; i-- {
-				last = mw[i](last)
-			}
-			last(c)
-		}
-	}
-}
-
 func corsMiddleware() gin.HandlerFunc {
 	allowedHost := map[string][]string{
 		"dev": {
@@ -64,33 +52,44 @@ func addUUIDToRequestCtxMiddleware() gin.HandlerFunc {
 	}
 }
 
-func authenticatedUser(next gin.HandlerFunc) gin.HandlerFunc {
-	m := chainMiddleware(parseJWT)
-	return m(next)
-}
-
-func parseJWT(next gin.HandlerFunc) gin.HandlerFunc {
+func authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
 
 		jwtToken := getBearerAuthToken(c)
 		if jwtToken == "" {
-			writer.WriteFailResponseFromError(c, errInvalidCredentials)
+			c.Next()
 			return
 		}
 
 		claims, err := jwt.ParseToken(jwtToken)
 		if err != nil {
-			writer.WriteFailResponseFromError(c, errInvalidCredentials)
+			c.Next()
 			return
 		}
 
 		userMeta := metadata.User{}
-		bytes, _ := json.Marshal(claims)
+		bytes, _ := json.Marshal(claims["user"])
 		_ = json.Unmarshal(bytes, &userMeta)
 
 		ctx = metadata.NewContextFromUser(ctx, userMeta)
 		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+func authenticatedUser(next gin.HandlerFunc) gin.HandlerFunc {
+	m := chainMiddleware(authenticateUser)
+	return m(next)
+}
+
+func authenticateUser(next gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !metadata.IsAuthenticated(c.Request.Context()) {
+			writer.WriteFailResponseFromError(c, errInvalidCredentials)
+			return
+		}
+
 		next(c)
 	}
 }
@@ -105,4 +104,16 @@ func getBearerAuthToken(c *gin.Context) (bearerToken string) {
 	}
 
 	return strings.TrimSpace(bearerToken)
+}
+
+func chainMiddleware(mw ...middleware) middleware {
+	return func(final gin.HandlerFunc) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			last := final
+			for i := len(mw) - 1; i >= 0; i-- {
+				last = mw[i](last)
+			}
+			last(c)
+		}
+	}
 }

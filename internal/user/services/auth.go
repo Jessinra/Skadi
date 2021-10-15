@@ -34,12 +34,12 @@ func (svc *UserService) RefreshToken(ctx context.Context, in RefreshTokenInput) 
 		return nil, errFailedToRefreshToken
 	}
 
-	userID, _ := claims["user_id"].(uint64)
+	userID, _ := claims["user_id"].(float64)
 	if userID == 0 {
 		return nil, errFailedToRefreshToken
 	}
 
-	return svc.GenerateAuthTokens(ctx, userID)
+	return svc.GenerateAuthTokens(ctx, uint64(userID))
 }
 
 func (svc *UserService) GenerateAuthTokens(ctx context.Context, userID uint64) (*GenerateAuthTokensOutput, error) {
@@ -80,7 +80,7 @@ func (svc *UserService) GenerateAuthTokens(ctx context.Context, userID uint64) (
 	}
 
 	return &GenerateAuthTokensOutput{
-		Token:        jwtToken,
+		AccessToken:  jwtToken,
 		RefreshToken: refreshToken,
 	}, nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/trivery-id/skadi/internal/user/services"
 	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 	writer "gitlab.com/trivery-id/skadi/utils/response-writer"
 )
 
@@ -39,4 +40,9 @@ func (ctrl *AuthController) RefreshToken(c *gin.Context) {
 	}
 
 	writer.WriteSuccessResponse(c, http.StatusOK, resp)
+}
+
+func (ctrl *AuthController) Test(c *gin.Context) {
+	user := metadata.GetUserFromContext(c.Request.Context())
+	writer.WriteSuccessResponse(c, http.StatusOK, user)
 }

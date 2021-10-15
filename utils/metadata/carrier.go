@@ -36,14 +36,15 @@ func NewContextFromUser(ctx context.Context, user User) context.Context {
 	return context.WithValue(ctx, ctxUserKey, user)
 }
 
+func IsAuthenticated(ctx context.Context) bool {
+	user := GetUserFromContext(ctx)
+	return user != nil && user.ID != 0
+}
+
 func GetUserFromContext(ctx context.Context) *User {
 	if user, ok := ctx.Value(ctxUserKey).(User); ok {
 		return &user
 	}
 
-	// TODO: remove this
-	return &User{
-		ID:   1001,
-		Name: "dummy",
-	}
+	return nil
 }

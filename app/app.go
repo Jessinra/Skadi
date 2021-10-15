@@ -21,7 +21,6 @@ var router = gin.Default()
 
 func StartApplication() {
 	initLogger()
-	initRoutes()
 	initSkadiDatabase()
 
 	initServices()
@@ -31,6 +30,7 @@ func StartApplication() {
 	initControllers()
 	validateControllers()
 
+	initRoutes()
 	resolver.InitResolvers()
 
 	logger.Info("about to start the application...")
