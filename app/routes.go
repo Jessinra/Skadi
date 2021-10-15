@@ -15,7 +15,7 @@ func initRoutes() {
 	router.POST("/auth/refresh", AuthController.RefreshToken)
 	router.POST("/auth/test", authenticatedUser(AuthController.Test))
 
-	router.POST("/graphql", authenticatedUser(graphqlHandler))
+	router.POST("/graphql", graphqlHandler)
 	router.GET("/playground", playgroundHandler)
 
 	router.GET("/", ping)

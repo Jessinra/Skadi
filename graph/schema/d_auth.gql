@@ -1,0 +1,5 @@
+
+type AuthTokens {
+    accessToken: String!
+    refreshToken: String!
+}

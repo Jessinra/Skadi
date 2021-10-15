@@ -8,9 +8,15 @@ import (
 
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
+	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
 func (r *orderResolver) Requester(ctx context.Context, obj *model.Order) (*model.User, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	user, err := userService.GetUser(ctx, obj.RequesterID)
 	if err != nil {
 		return nil, err
@@ -20,6 +26,10 @@ func (r *orderResolver) Requester(ctx context.Context, obj *model.Order) (*model
 }
 
 func (r *orderResolver) Shopper(ctx context.Context, obj *model.Order) (*model.User, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	if id := obj.ShopperID; id == nil || *id == 0 {
 		return nil, nil
 	}
@@ -33,6 +43,10 @@ func (r *orderResolver) Shopper(ctx context.Context, obj *model.Order) (*model.U
 }
 
 func (r *orderResolver) Product(ctx context.Context, obj *model.Order) (*model.Product, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	product, err := productService.GetProduct(ctx, obj.ProductID)
 	if err != nil {
 		return nil, err

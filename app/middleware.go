@@ -14,8 +14,6 @@ import (
 	writer "gitlab.com/trivery-id/skadi/utils/response-writer"
 )
 
-var errInvalidCredentials = errors.NewUnauthorizedError("invalid credentials")
-
 type middleware func(next gin.HandlerFunc) gin.HandlerFunc
 
 func corsMiddleware() gin.HandlerFunc {
@@ -86,7 +84,7 @@ func authenticatedUser(next gin.HandlerFunc) gin.HandlerFunc {
 func authenticateUser(next gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !metadata.IsAuthenticated(c.Request.Context()) {
-			writer.WriteFailResponseFromError(c, errInvalidCredentials)
+			writer.WriteFailResponseFromError(c, errors.ErrInvalidCredentials)
 			return
 		}
 

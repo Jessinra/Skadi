@@ -42,7 +42,7 @@ func (ctrl *AuthController) RefreshToken(c *gin.Context) {
 	writer.WriteSuccessResponse(c, http.StatusOK, resp)
 }
 
-func (ctrl *AuthController) Test(c *gin.Context) {
+func (*AuthController) Test(c *gin.Context) {
 	user := metadata.GetUserFromContext(c.Request.Context())
 	writer.WriteSuccessResponse(c, http.StatusOK, user)
 }

@@ -23,6 +23,11 @@ type Address struct {
 	Latitude    *float64   `json:"latitude"`
 }
 
+type AuthTokens struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 type CreateOrder struct {
 	Product   *CreateProduct   `json:"product"`
 	ProductID *uint64          `json:"productID"`
@@ -93,6 +98,11 @@ type DeleteProductPrice struct {
 type DropOrder struct {
 	ID     uint64 `json:"id"`
 	Reason string `json:"reason"`
+}
+
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type Order struct {
@@ -173,6 +183,10 @@ type ProductPrice struct {
 	Currency         string    `json:"currency"`
 	Price            uint64    `json:"price"`
 	IsPriceEstimated bool      `json:"isPriceEstimated"`
+}
+
+type RefreshTokenInput struct {
+	RefreshToken string `json:"refreshToken"`
 }
 
 type RegisterUser struct {

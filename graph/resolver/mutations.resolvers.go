@@ -11,7 +11,32 @@ import (
 	productSvc "gitlab.com/trivery-id/skadi/internal/product/services"
 	todoSvc "gitlab.com/trivery-id/skadi/internal/todo/services"
 	userSvc "gitlab.com/trivery-id/skadi/internal/user/services"
+	"gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
+
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthTokens, error) {
+	tokens, err := userService.Login(ctx, userSvc.LoginInput{
+		Email:    input.Email,
+		Password: input.Password,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewAuthToken(tokens), nil
+}
+
+func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (*model.AuthTokens, error) {
+	tokens, err := userService.RefreshToken(ctx, userSvc.RefreshTokenInput{
+		RefreshToken: input.RefreshToken,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return model.NewAuthToken(tokens), nil
+}
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.RegisterUser) (*model.User, error) {
 	user, err := userService.RegisterUser(ctx, userSvc.RegisterUserInput{
@@ -27,6 +52,10 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input model.Registe
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUser) (*model.User, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	user, err := userService.UpdateUser(ctx, userSvc.UpdateUserInput{
 		ID:                input.ID,
 		Name:              input.Name,
@@ -43,6 +72,10 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUse
 }
 
 func (r *mutationResolver) UpdateUserPassword(ctx context.Context, input model.UpdateUserPassword) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	if err := userService.UpdateUserPassword(ctx, userSvc.UpdateUserPasswordInput{
 		ID:          input.ID,
 		Password:    input.Password,
@@ -55,6 +88,10 @@ func (r *mutationResolver) UpdateUserPassword(ctx context.Context, input model.U
 }
 
 func (r *mutationResolver) CreateProduct(ctx context.Context, input model.CreateProduct) (*model.Product, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	product, err := productService.CreateNewProduct(ctx, productSvc.CreateNewProductInput{
 		Name:        input.Name,
 		Description: input.Description,
@@ -88,6 +125,10 @@ func (r *mutationResolver) CreateProduct(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) CreateProductLocation(ctx context.Context, input model.CreateProductLocation) (*model.ProductLocation, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	location, err := productService.CreateNewProductLocation(ctx, productSvc.CreateNewProductLocationInput{
 		ProductID: *input.ProductID,
 		Text:      input.Text,
@@ -109,6 +150,10 @@ func (r *mutationResolver) CreateProductLocation(ctx context.Context, input mode
 }
 
 func (r *mutationResolver) UpdateProductLocation(ctx context.Context, input model.UpdateProductLocation) (*model.ProductLocation, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	location, err := productService.UpdateProductLocation(ctx, productSvc.UpdateProductLocationInput{
 		ID:        input.ID,
 		Text:      input.Text,
@@ -129,6 +174,10 @@ func (r *mutationResolver) UpdateProductLocation(ctx context.Context, input mode
 }
 
 func (r *mutationResolver) DeleteProductLocation(ctx context.Context, input model.DeleteProductLocation) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	if err := productService.DeleteProductLocation(ctx, input.ID); err != nil {
 		return false, err
 	}
@@ -137,6 +186,10 @@ func (r *mutationResolver) DeleteProductLocation(ctx context.Context, input mode
 }
 
 func (r *mutationResolver) CreateProductPrice(ctx context.Context, input model.CreateProductPrice) (*model.ProductPrice, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	price, err := productService.CreateNewProductPrice(ctx, productSvc.CreateNewProductPriceInput{
 		ProductID:        *input.ProductID,
 		Currency:         input.Currency,
@@ -151,6 +204,10 @@ func (r *mutationResolver) CreateProductPrice(ctx context.Context, input model.C
 }
 
 func (r *mutationResolver) UpdateProductPrice(ctx context.Context, input model.UpdateProductPrice) (*model.ProductPrice, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	price, err := productService.UpdateProductPrice(ctx, productSvc.UpdateProductPriceInput{
 		ID:               input.ID,
 		Price:            input.Price,
@@ -164,6 +221,10 @@ func (r *mutationResolver) UpdateProductPrice(ctx context.Context, input model.U
 }
 
 func (r *mutationResolver) DeleteProductPrice(ctx context.Context, input model.DeleteProductPrice) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	if err := productService.DeleteProductPrice(ctx, input.ID); err != nil {
 		return false, err
 	}
@@ -172,6 +233,10 @@ func (r *mutationResolver) DeleteProductPrice(ctx context.Context, input model.D
 }
 
 func (r *mutationResolver) CreateOrder(ctx context.Context, input model.CreateOrder) (*model.Order, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	if input.Product != nil {
 		product, err := r.CreateProduct(ctx, *input.Product)
 		if err != nil {
@@ -203,6 +268,10 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input model.CreateOr
 }
 
 func (r *mutationResolver) TakeOrder(ctx context.Context, input model.TakeOrder) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	err := productService.TakeOrder(ctx, productSvc.TakeOrderInput{
 		OrderID: input.ID,
 	})
@@ -214,6 +283,10 @@ func (r *mutationResolver) TakeOrder(ctx context.Context, input model.TakeOrder)
 }
 
 func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	err := productService.DropOrder(ctx, productSvc.DropOrderInput{
 		OrderID: input.ID,
 		Reason:  input.Reason,
@@ -226,6 +299,10 @@ func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder)
 }
 
 func (r *mutationResolver) DeleteOrder(ctx context.Context, input model.DeleteOrder) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
 	err := productService.DeleteOrder(ctx, productSvc.DeleteOrderInput{
 		OrderID: input.ID,
 	})
@@ -237,6 +314,10 @@ func (r *mutationResolver) DeleteOrder(ctx context.Context, input model.DeleteOr
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return nil, errors.ErrInvalidCredentials
+	}
+
 	todo, err := todoService.CreateNewTodo(ctx, todoSvc.CreateNewTodoInput{
 		Text:        input.Text,
 		Description: input.Description,
