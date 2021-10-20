@@ -72,7 +72,30 @@ func (svc *ProductService) DropOrder(ctx context.Context, in DropOrderInput) err
 		return err
 	}
 
-	if err := order.Drop(user.ID, in.Reason); err != nil {
+	if err := order.DroppedBy(user.ID, in.Reason); err != nil {
+		return err
+	}
+
+	return svc.OrderRepository.Update(ctx, order)
+}
+
+func (svc *ProductService) UpdateOrderState(ctx context.Context, in UpdateOrderStateInput) error {
+	user := metadata.GetUserFromContext(ctx)
+
+	if err := in.Validate(); err != nil {
+		return err
+	}
+
+	order, err := svc.OrderRepository.Find(ctx, in.OrderID)
+	if err != nil {
+		return err
+	}
+
+	if order.RequesterID != user.ID && order.ShopperID != user.ID {
+		return errors.NewForbiddenError("not your order")
+	}
+
+	if err := order.UpdateLastState(in.State); err != nil {
 		return err
 	}
 

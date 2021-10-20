@@ -25,6 +25,7 @@ type Mutation {
     createOrder(input: CreateOrder!): Order!
     takeOrder(input: TakeOrder!): Boolean!
     dropOrder(input: DropOrder!): Boolean!
+    updateOrderState(input: UpdateOrderState!): Boolean!
     deleteOrder(input: DeleteOrder!): Boolean!
 
     createTodo(input: CreateTodo!): Todo!

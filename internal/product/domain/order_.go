@@ -41,12 +41,10 @@ func (o *Order) AcceptedBy(userID uint64) error {
 	}
 
 	o.ShopperID = userID
-	o.State.LastState = enums.StateAccepted
-	o.State.TimeOrderAccepted = ptr.Time(time.Now())
-	return nil
+	return o.UpdateLastState(enums.StateAccepted)
 }
 
-func (o *Order) Drop(userID uint64, reason string) error {
+func (o *Order) DroppedBy(userID uint64, reason string) error {
 	if o.ShopperID != userID {
 		return errors.NewBadRequestError("you are not the shopper")
 	}
@@ -58,6 +56,31 @@ func (o *Order) Drop(userID uint64, reason string) error {
 		ShopperID: o.ShopperID,
 		Reason:    reason,
 	})
+
+	return nil
+}
+
+func (o *Order) UpdateLastState(state enums.OrderState) error {
+	if err := ValidateStateTransitions(o.State.LastState, state); err != nil {
+		return err
+	}
+
+	o.State.LastState = state
+
+	switch state {
+	case enums.StateAccepted:
+		o.State.TimeOrderAccepted = ptr.Time(time.Now())
+	case enums.StatePurchased:
+		o.State.TimeOrderPurchased = ptr.Time(time.Now())
+	case enums.StateOnTheWay:
+		o.State.TimeOrderOnTheWay = ptr.Time(time.Now())
+	case enums.StateDelivered:
+		o.State.TimeOrderDelivered = ptr.Time(time.Now())
+	case enums.StateReviewed:
+		o.State.TimeOrderReviewed = ptr.Time(time.Now())
+	case enums.StateCompleted:
+		o.State.TimeOrderCompleted = ptr.Time(time.Now())
+	}
 
 	return nil
 }
@@ -85,25 +108,6 @@ func (d *OrderDeal) Validate() error {
 	}
 
 	return nil
-}
-
-func NewOrderState() OrderState {
-	return OrderState{
-		LastState:        enums.StateCreated,
-		TimeOrderCreated: ptr.Time(time.Now()),
-	}
-}
-
-type OrderState struct {
-	LastState string
-
-	TimeOrderCreated   *time.Time
-	TimeOrderAccepted  *time.Time
-	TimeOrderPurchased *time.Time
-	TimeOrderOnTheWay  *time.Time
-	TimeOrderDelivered *time.Time
-	TimeOrderReviewed  *time.Time
-	TimeOrderCompleted *time.Time
 }
 
 type OrderCancellation struct {

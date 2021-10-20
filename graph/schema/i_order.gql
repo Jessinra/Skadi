@@ -27,6 +27,11 @@ input DropOrder {
     reason: String!
 }
 
+input UpdateOrderState {
+    id: ID!
+    state: String!
+}
+
 input DeleteOrder {
     id: ID!
 }

@@ -298,6 +298,22 @@ func (r *mutationResolver) DropOrder(ctx context.Context, input model.DropOrder)
 	return true, nil
 }
 
+func (r *mutationResolver) UpdateOrderState(ctx context.Context, input model.UpdateOrderState) (bool, error) {
+	if !metadata.IsAuthenticated(ctx) {
+		return false, errors.ErrInvalidCredentials
+	}
+
+	err := productService.UpdateOrderState(ctx, productSvc.UpdateOrderStateInput{
+		OrderID: input.ID,
+		State:   input.State,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *mutationResolver) DeleteOrder(ctx context.Context, input model.DeleteOrder) (bool, error) {
 	if !metadata.IsAuthenticated(ctx) {
 		return false, errors.ErrInvalidCredentials

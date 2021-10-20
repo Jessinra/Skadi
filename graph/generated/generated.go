@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		RefreshToken          func(childComplexity int, input model.RefreshTokenInput) int
 		RegisterUser          func(childComplexity int, input model.RegisterUser) int
 		TakeOrder             func(childComplexity int, input model.TakeOrder) int
+		UpdateOrderState      func(childComplexity int, input model.UpdateOrderState) int
 		UpdateProductLocation func(childComplexity int, input model.UpdateProductLocation) int
 		UpdateProductPrice    func(childComplexity int, input model.UpdateProductPrice) int
 		UpdateUser            func(childComplexity int, input model.UpdateUser) int
@@ -215,6 +216,7 @@ type MutationResolver interface {
 	CreateOrder(ctx context.Context, input model.CreateOrder) (*model.Order, error)
 	TakeOrder(ctx context.Context, input model.TakeOrder) (bool, error)
 	DropOrder(ctx context.Context, input model.DropOrder) (bool, error)
+	UpdateOrderState(ctx context.Context, input model.UpdateOrderState) (bool, error)
 	DeleteOrder(ctx context.Context, input model.DeleteOrder) (bool, error)
 	CreateTodo(ctx context.Context, input model.CreateTodo) (*model.Todo, error)
 }
@@ -519,6 +521,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.TakeOrder(childComplexity, args["input"].(model.TakeOrder)), true
+
+	case "Mutation.updateOrderState":
+		if e.complexity.Mutation.UpdateOrderState == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateOrderState_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateOrderState(childComplexity, args["input"].(model.UpdateOrderState)), true
 
 	case "Mutation.updateProductLocation":
 		if e.complexity.Mutation.UpdateProductLocation == nil {
@@ -1416,6 +1430,11 @@ input DropOrder {
     reason: String!
 }
 
+input UpdateOrderState {
+    id: ID!
+    state: String!
+}
+
 input DeleteOrder {
     id: ID!
 }`, BuiltIn: false},
@@ -1512,6 +1531,7 @@ type Mutation {
     createOrder(input: CreateOrder!): Order!
     takeOrder(input: TakeOrder!): Boolean!
     dropOrder(input: DropOrder!): Boolean!
+    updateOrderState(input: UpdateOrderState!): Boolean!
     deleteOrder(input: DeleteOrder!): Boolean!
 
     createTodo(input: CreateTodo!): Todo!
@@ -1744,6 +1764,21 @@ func (ec *executionContext) field_Mutation_takeOrder_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNTakeOrder2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐTakeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateOrderState_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateOrderState
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateOrderState2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateOrderState(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3135,6 +3170,48 @@ func (ec *executionContext) _Mutation_dropOrder(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DropOrder(rctx, args["input"].(model.DropOrder))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateOrderState(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateOrderState_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateOrderState(rctx, args["input"].(model.UpdateOrderState))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7812,6 +7889,37 @@ func (ec *executionContext) unmarshalInputTakeOrder(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateOrderState(ctx context.Context, obj interface{}) (model.UpdateOrderState, error) {
+	var it model.UpdateOrderState
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "state":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("state"))
+			it.State, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateProductLocation(ctx context.Context, obj interface{}) (model.UpdateProductLocation, error) {
 	var it model.UpdateProductLocation
 	asMap := map[string]interface{}{}
@@ -8254,6 +8362,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "dropOrder":
 			out.Values[i] = ec._Mutation_dropOrder(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateOrderState":
+			out.Values[i] = ec._Mutation_updateOrderState(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9561,6 +9674,11 @@ func (ec *executionContext) marshalNUint642uint64(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateOrderState2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateOrderState(ctx context.Context, v interface{}) (model.UpdateOrderState, error) {
+	res, err := ec.unmarshalInputUpdateOrderState(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUpdateProductLocation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐUpdateProductLocation(ctx context.Context, v interface{}) (model.UpdateProductLocation, error) {

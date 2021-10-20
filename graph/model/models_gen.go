@@ -208,6 +208,11 @@ type Todo struct {
 	UserID      uint64    `json:"userID"`
 }
 
+type UpdateOrderState struct {
+	ID    uint64 `json:"id"`
+	State string `json:"state"`
+}
+
 type UpdateProductLocation struct {
 	ID        uint64   `json:"id"`
 	Text      *string  `json:"text"`

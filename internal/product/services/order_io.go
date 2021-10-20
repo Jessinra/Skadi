@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.com/trivery-id/skadi/internal/product/enums"
 	"gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/validation"
 )
@@ -65,6 +66,23 @@ func (in *DropOrderInput) Validate() error {
 	if err := validation.ValidateStruct(in,
 		validation.Field(&in.OrderID, validation.Required),
 		validation.Field(&in.Reason, validation.Length(50, 400)), // nolint
+	); err != nil {
+		errMsg := strings.ReplaceAll(err.Error(), ".", "")
+		return errors.NewBadRequestError(errMsg)
+	}
+
+	return nil
+}
+
+type UpdateOrderStateInput struct {
+	OrderID uint64
+	State   string
+}
+
+func (in *UpdateOrderStateInput) Validate() error {
+	if err := validation.ValidateStruct(in,
+		validation.Field(&in.OrderID, validation.Required),
+		validation.Field(&in.State, validation.Required, validation.By(enums.ValidatedOrderState)),
 	); err != nil {
 		errMsg := strings.ReplaceAll(err.Error(), ".", "")
 		return errors.NewBadRequestError(errMsg)
