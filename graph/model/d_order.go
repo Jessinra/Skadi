@@ -19,6 +19,13 @@ func NewOrder(in *domain.Order) *Order {
 		Deal:          NewOrderDeal(&in.Deal),
 		State:         NewOrderState(&in.State),
 		Cancellations: NewOrderCancellations(in.Cancellations),
+		Details: []OrderDetails{
+			NewOrderDetails("Quantity", in.Quantity),
+			NewOrderDetails("Due Date", in.Deal.Time),
+			NewOrderDetails("Deal in", in.Deal.Location),
+			NewOrderDetails("Collection Method", in.Deal.Method),
+			NewOrderDetails("Additional Notes", in.Notes),
+		},
 	}
 }
 
@@ -59,4 +66,11 @@ func NewOrderCancellations(in []domain.OrderCancellation) []OrderCancellation {
 	}
 
 	return out
+}
+
+func NewOrderDetails(key string, value interface{}) OrderDetails {
+	return OrderDetails{
+		Key:   key,
+		Value: value,
+	}
 }

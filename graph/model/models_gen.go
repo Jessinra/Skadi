@@ -114,6 +114,7 @@ type Order struct {
 	Deal          *OrderDeal          `json:"deal"`
 	State         *OrderState         `json:"state"`
 	Cancellations []OrderCancellation `json:"cancellations"`
+	Details       []OrderDetails      `json:"details"`
 }
 
 type OrderCancellation struct {
@@ -126,6 +127,11 @@ type OrderDeal struct {
 	Method     string    `json:"method"`
 	Time       time.Time `json:"time"`
 	IncludeBox bool      `json:"includeBox"`
+}
+
+type OrderDetails struct {
+	Key   string      `json:"key"`
+	Value interface{} `json:"value"`
 }
 
 type OrderState struct {
