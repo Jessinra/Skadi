@@ -28,5 +28,5 @@ type Mutation {
     updateOrderState(input: UpdateOrderState!): Boolean!
     deleteOrder(input: DeleteOrder!): Boolean!
 
-    createTodo(input: CreateTodo!): Todo!
+    uploadFiles(input: [Upload!]!): [String!]!
 }

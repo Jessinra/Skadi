@@ -19,3 +19,5 @@ utils/**/*.test
 
 # ignore test env values
 .env.test
+
+*.DS_Store

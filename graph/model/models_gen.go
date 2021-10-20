@@ -77,12 +77,6 @@ type CreateProductPrice struct {
 	IsPriceEstimated bool    `json:"isPriceEstimated"`
 }
 
-type CreateTodo struct {
-	Text        string  `json:"text"`
-	Description *string `json:"description"`
-	UserID      uint64  `json:"userID"`
-}
-
 type DeleteOrder struct {
 	ID uint64 `json:"id"`
 }
@@ -197,15 +191,6 @@ type RegisterUser struct {
 
 type TakeOrder struct {
 	ID uint64 `json:"id"`
-}
-
-type Todo struct {
-	ID          uint64    `json:"id"`
-	CreatedAt   time.Time `json:"createdAt"`
-	Text        string    `json:"text"`
-	Description *string   `json:"description"`
-	Done        bool      `json:"done"`
-	UserID      uint64    `json:"userID"`
 }
 
 type UpdateOrderState struct {
