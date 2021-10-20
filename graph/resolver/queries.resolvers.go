@@ -9,13 +9,13 @@ import (
 	"gitlab.com/trivery-id/skadi/graph/generated"
 	"gitlab.com/trivery-id/skadi/graph/model"
 	productSvc "gitlab.com/trivery-id/skadi/internal/product/services"
-	"gitlab.com/trivery-id/skadi/utils/errors"
+	errs "gitlab.com/trivery-id/skadi/utils/errors"
 	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
 func (r *queryResolver) User(ctx context.Context, id uint64) (*model.User, error) {
 	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	user, err := userService.GetUser(ctx, id)
@@ -28,7 +28,7 @@ func (r *queryResolver) User(ctx context.Context, id uint64) (*model.User, error
 
 func (r *queryResolver) Product(ctx context.Context, id uint64) (*model.Product, error) {
 	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	product, err := productService.GetProduct(ctx, id)
@@ -41,7 +41,7 @@ func (r *queryResolver) Product(ctx context.Context, id uint64) (*model.Product,
 
 func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) ([]model.Product, error) {
 	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	products, err := productService.GetAllProducts(ctx, productSvc.GetAllProductsInput{
@@ -57,7 +57,7 @@ func (r *queryResolver) Products(ctx context.Context, limit *int, offset *int) (
 
 func (r *queryResolver) Order(ctx context.Context, id uint64) (*model.Order, error) {
 	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	order, err := productService.GetOrder(ctx, productSvc.GetOrderInput{
@@ -72,7 +72,7 @@ func (r *queryResolver) Order(ctx context.Context, id uint64) (*model.Order, err
 
 func (r *queryResolver) Orders(ctx context.Context, userID uint64, limit *int, offset *int) ([]model.Order, error) {
 	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
+		return nil, errs.ErrInvalidCredentials
 	}
 
 	orders, err := productService.GetAllOrders(ctx, productSvc.GetAllOrdersInput{
@@ -84,23 +84,6 @@ func (r *queryResolver) Orders(ctx context.Context, userID uint64, limit *int, o
 	}
 
 	return model.NewOrders(orders), nil
-}
-
-func (r *queryResolver) GetTodos(ctx context.Context, userID *uint64) ([]model.Todo, error) {
-	if !metadata.IsAuthenticated(ctx) {
-		return nil, errors.ErrInvalidCredentials
-	}
-
-	if userID == nil {
-		return nil, errors.New("userID is required")
-	}
-
-	todos, err := todoService.GetAllTodos(ctx, *userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return model.NewTodos(todos), nil
 }
 
 // Query returns generated.QueryResolver implementation.

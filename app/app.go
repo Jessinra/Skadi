@@ -10,6 +10,7 @@ import (
 	"gitlab.com/trivery-id/skadi/external/db/postgres"
 	"gitlab.com/trivery-id/skadi/external/secret-manager/aws"
 	"gitlab.com/trivery-id/skadi/graph/resolver"
+	fileServices "gitlab.com/trivery-id/skadi/internal/file/services"
 	productServices "gitlab.com/trivery-id/skadi/internal/product/services"
 	userController "gitlab.com/trivery-id/skadi/internal/user/controller"
 	userServices "gitlab.com/trivery-id/skadi/internal/user/services"
@@ -84,6 +85,10 @@ func initSkadiDatabase() {
 func initServices() {
 	// sorted alphabetically
 
+	if err := fileServices.InitServices(); err != nil {
+		logger.Error("Failed to initialize fileServices", err)
+		panic(fmt.Sprintf("Failed to initialize fileServices: `%+v`", err))
+	}
 	if err := productServices.InitServices(); err != nil {
 		logger.Error("Failed to initialize productServices", err)
 		panic(fmt.Sprintf("Failed to initialize productServices: `%+v`", err))
@@ -97,6 +102,10 @@ func initServices() {
 func initServiceDependencies() {
 	// sorted alphabetically
 
+	if err := fileServices.InitServiceDependencies(); err != nil {
+		logger.Error("Failed to initialize fileServices dependencies", err)
+		panic(fmt.Sprintf("Failed to initialize fileServices dependencies: `%+v`", err))
+	}
 	if err := productServices.InitServiceDependencies(); err != nil {
 		logger.Error("Failed to initialize productServices dependencies", err)
 		panic(fmt.Sprintf("Failed to initialize productServices dependencies: `%+v`", err))
@@ -110,6 +119,10 @@ func initServiceDependencies() {
 func validateServices() {
 	// sorted alphabetically
 
+	if err := fileServices.ValidateServices(); err != nil {
+		logger.Error("Invalid fileServices initialization", err)
+		panic(fmt.Sprintf("Invalid fileServices initialization: `%+v`", err))
+	}
 	if err := productServices.ValidateServices(); err != nil {
 		logger.Error("Invalid productServices initialization", err)
 		panic(fmt.Sprintf("Invalid productServices initialization: `%+v`", err))

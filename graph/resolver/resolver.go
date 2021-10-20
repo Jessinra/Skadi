@@ -3,8 +3,8 @@
 package resolver
 
 import (
+	file "gitlab.com/trivery-id/skadi/internal/file/services"
 	product "gitlab.com/trivery-id/skadi/internal/product/services"
-	todo "gitlab.com/trivery-id/skadi/internal/todo/services"
 	user "gitlab.com/trivery-id/skadi/internal/user/services"
 )
 
@@ -15,13 +15,13 @@ import (
 type Resolver struct{}
 
 var (
+	fileService    *file.FileService
 	productService *product.ProductService
 	userService    *user.UserService
-	todoService    *todo.TodoService
 )
 
 func InitResolvers() {
+	fileService = file.GetFileService()
 	productService = product.GetProductService()
 	userService = user.GetUserService()
-	todoService = &todo.TodoService{}
 }
