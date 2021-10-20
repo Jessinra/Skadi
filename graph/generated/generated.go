@@ -92,6 +92,7 @@ type ComplexityRoot struct {
 	Order struct {
 		Cancellations func(childComplexity int) int
 		Deal          func(childComplexity int) int
+		Details       func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Notes         func(childComplexity int) int
 		Price         func(childComplexity int) int
@@ -116,6 +117,11 @@ type ComplexityRoot struct {
 		Location   func(childComplexity int) int
 		Method     func(childComplexity int) int
 		Time       func(childComplexity int) int
+	}
+
+	OrderDetails struct {
+		Key   func(childComplexity int) int
+		Value func(childComplexity int) int
 	}
 
 	OrderState struct {
@@ -585,6 +591,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Order.Deal(childComplexity), true
 
+	case "Order.details":
+		if e.complexity.Order.Details == nil {
+			break
+		}
+
+		return e.complexity.Order.Details(childComplexity), true
+
 	case "Order.id":
 		if e.complexity.Order.ID == nil {
 			break
@@ -710,6 +723,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.OrderDeal.Time(childComplexity), true
+
+	case "OrderDetails.key":
+		if e.complexity.OrderDetails.Key == nil {
+			break
+		}
+
+		return e.complexity.OrderDetails.Key(childComplexity), true
+
+	case "OrderDetails.value":
+		if e.complexity.OrderDetails.Value == nil {
+			break
+		}
+
+		return e.complexity.OrderDetails.Value(childComplexity), true
 
 	case "OrderState.lastState":
 		if e.complexity.OrderState.LastState == nil {
@@ -1217,6 +1244,8 @@ type Order {
     deal: OrderDeal!
     state: OrderState!
     cancellations: [OrderCancellation!]
+
+    details: [OrderDetails!]
 }
 
 type OrderDeal {
@@ -1241,6 +1270,11 @@ type OrderState {
 type OrderCancellation {
     createdAt: Time!
     reason: String!
+}
+
+type OrderDetails {
+    key: String!
+    value: Any!
 }`, BuiltIn: false},
 	{Name: "graph/schema/d_product.gql", Input: `
 type Product {
@@ -1486,7 +1520,8 @@ type Query {
 	orders(userID: ID!, limit: Int, offset: Int): [Order!]
 }
 `, BuiltIn: false},
-	{Name: "graph/schema/scalar.gql", Input: `scalar Time
+	{Name: "graph/schema/scalar.gql", Input: `scalar Any
+scalar Time
 scalar Uint64
 scalar Upload`, BuiltIn: false},
 }
@@ -3694,6 +3729,38 @@ func (ec *executionContext) _Order_cancellations(ctx context.Context, field grap
 	return ec.marshalOOrderCancellation2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderCancellationᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Order_details(ctx context.Context, field graphql.CollectedField, obj *model.Order) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Order",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Details, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.OrderDetails)
+	fc.Result = res
+	return ec.marshalOOrderDetails2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderDetailsᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _OrderCancellation_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.OrderCancellation) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3902,6 +3969,76 @@ func (ec *executionContext) _OrderDeal_includeBox(ctx context.Context, field gra
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderDetails_key(ctx context.Context, field graphql.CollectedField, obj *model.OrderDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OrderDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OrderDetails_value(ctx context.Context, field graphql.CollectedField, obj *model.OrderDetails) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OrderDetails",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(interface{})
+	fc.Result = res
+	return ec.marshalNAny2interface(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _OrderState_lastState(ctx context.Context, field graphql.CollectedField, obj *model.OrderState) (ret graphql.Marshaler) {
@@ -8103,6 +8240,8 @@ func (ec *executionContext) _Order(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "cancellations":
 			out.Values[i] = ec._Order_cancellations(ctx, field, obj)
+		case "details":
+			out.Values[i] = ec._Order_details(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8174,6 +8313,38 @@ func (ec *executionContext) _OrderDeal(ctx context.Context, sel ast.SelectionSet
 			}
 		case "includeBox":
 			out.Values[i] = ec._OrderDeal_includeBox(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var orderDetailsImplementors = []string{"OrderDetails"}
+
+func (ec *executionContext) _OrderDetails(ctx context.Context, sel ast.SelectionSet, obj *model.OrderDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, orderDetailsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrderDetails")
+		case "key":
+			out.Values[i] = ec._OrderDetails_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+			out.Values[i] = ec._OrderDetails_value(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -8856,6 +9027,27 @@ func (ec *executionContext) marshalNAddress2gitlabᚗcomᚋtriveryᚑidᚋskadi�
 	return ec._Address(ctx, sel, &v)
 }
 
+func (ec *executionContext) unmarshalNAny2interface(ctx context.Context, v interface{}) (interface{}, error) {
+	res, err := graphql.UnmarshalAny(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAny2interface(ctx context.Context, sel ast.SelectionSet, v interface{}) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := graphql.MarshalAny(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNAuthTokens2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐAuthTokens(ctx context.Context, sel ast.SelectionSet, v model.AuthTokens) graphql.Marshaler {
 	return ec._AuthTokens(ctx, sel, &v)
 }
@@ -9016,6 +9208,10 @@ func (ec *executionContext) marshalNOrderDeal2ᚖgitlabᚗcomᚋtriveryᚑidᚋs
 		return graphql.Null
 	}
 	return ec._OrderDeal(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOrderDetails2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderDetails(ctx context.Context, sel ast.SelectionSet, v model.OrderDetails) graphql.Marshaler {
+	return ec._OrderDetails(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNOrderState2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderState(ctx context.Context, sel ast.SelectionSet, v *model.OrderState) graphql.Marshaler {
@@ -9712,6 +9908,53 @@ func (ec *executionContext) marshalOOrderCancellation2ᚕgitlabᚗcomᚋtrivery�
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNOrderCancellation2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderCancellation(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOOrderDetails2ᚕgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderDetailsᚄ(ctx context.Context, sel ast.SelectionSet, v []model.OrderDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOrderDetails2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐOrderDetails(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

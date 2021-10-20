@@ -18,6 +18,8 @@ type Order {
     deal: OrderDeal!
     state: OrderState!
     cancellations: [OrderCancellation!]
+
+    details: [OrderDetails!]
 }
 
 type OrderDeal {
@@ -42,4 +44,9 @@ type OrderState {
 type OrderCancellation {
     createdAt: Time!
     reason: String!
+}
+
+type OrderDetails {
+    key: String!
+    value: Any!
 }
