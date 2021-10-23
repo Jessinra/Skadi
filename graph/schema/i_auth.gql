@@ -7,3 +7,7 @@ input LoginInput {
 input RefreshTokenInput {
     refreshToken: String!
 }
+
+input ValidateTokenInput {
+    accessToken: String!
+}

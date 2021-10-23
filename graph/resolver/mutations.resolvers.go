@@ -13,6 +13,7 @@ import (
 	productSvc "gitlab.com/trivery-id/skadi/internal/product/services"
 	userSvc "gitlab.com/trivery-id/skadi/internal/user/services"
 	errs "gitlab.com/trivery-id/skadi/utils/errors"
+	"gitlab.com/trivery-id/skadi/utils/jwt"
 	"gitlab.com/trivery-id/skadi/utils/metadata"
 )
 
@@ -37,6 +38,14 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 	}
 
 	return model.NewAuthToken(tokens), nil
+}
+
+func (r *mutationResolver) ValidateToken(ctx context.Context, input model.ValidateTokenInput) (bool, error) {
+	if _, err := jwt.ParseToken(input.AccessToken); err != nil {
+		return false, errs.ErrInvalidCredentials
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, input model.RegisterUser) (*model.User, error) {

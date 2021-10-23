@@ -250,3 +250,7 @@ type User struct {
 	CurrencySub       *string   `json:"currencySub"`
 	Addresses         []Address `json:"addresses"`
 }
+
+type ValidateTokenInput struct {
+	AccessToken string `json:"accessToken"`
+}

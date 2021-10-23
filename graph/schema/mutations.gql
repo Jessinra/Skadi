@@ -7,6 +7,7 @@
 type Mutation {
     login(input: LoginInput!): AuthTokens!
     refreshToken(input: RefreshTokenInput!): AuthTokens!
+    validateToken(input: ValidateTokenInput!): Boolean!
 
     registerUser(input: RegisterUser!): User!
     updateUser(input: UpdateUser!): User!

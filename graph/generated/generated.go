@@ -87,6 +87,7 @@ type ComplexityRoot struct {
 		UpdateUser            func(childComplexity int, input model.UpdateUser) int
 		UpdateUserPassword    func(childComplexity int, input model.UpdateUserPassword) int
 		UploadFiles           func(childComplexity int, input []graphql.Upload) int
+		ValidateToken         func(childComplexity int, input model.ValidateTokenInput) int
 	}
 
 	Order struct {
@@ -199,6 +200,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	Login(ctx context.Context, input model.LoginInput) (*model.AuthTokens, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (*model.AuthTokens, error)
+	ValidateToken(ctx context.Context, input model.ValidateTokenInput) (bool, error)
 	RegisterUser(ctx context.Context, input model.RegisterUser) (*model.User, error)
 	UpdateUser(ctx context.Context, input model.UpdateUser) (*model.User, error)
 	UpdateUserPassword(ctx context.Context, input model.UpdateUserPassword) (bool, error)
@@ -576,6 +578,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UploadFiles(childComplexity, args["input"].([]graphql.Upload)), true
+
+	case "Mutation.validateToken":
+		if e.complexity.Mutation.ValidateToken == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_validateToken_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ValidateToken(childComplexity, args["input"].(model.ValidateTokenInput)), true
 
 	case "Order.cancellations":
 		if e.complexity.Order.Cancellations == nil {
@@ -1369,6 +1383,10 @@ input LoginInput {
 
 input RefreshTokenInput {
     refreshToken: String!
+}
+
+input ValidateTokenInput {
+    accessToken: String!
 }`, BuiltIn: false},
 	{Name: "graph/schema/i_order.gql", Input: `
 input CreateOrder {
@@ -1482,6 +1500,7 @@ input DeleteProductPrice{
 type Mutation {
     login(input: LoginInput!): AuthTokens!
     refreshToken(input: RefreshTokenInput!): AuthTokens!
+    validateToken(input: ValidateTokenInput!): Boolean!
 
     registerUser(input: RegisterUser!): User!
     updateUser(input: UpdateUser!): User!
@@ -1793,6 +1812,21 @@ func (ec *executionContext) field_Mutation_uploadFiles_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpload2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_validateToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ValidateTokenInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNValidateTokenInput2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐValidateTokenInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2577,6 +2611,48 @@ func (ec *executionContext) _Mutation_refreshToken(ctx context.Context, field gr
 	res := resTmp.(*model.AuthTokens)
 	fc.Result = res
 	return ec.marshalNAuthTokens2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐAuthTokens(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_validateToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_validateToken_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ValidateToken(rctx, args["input"].(model.ValidateTokenInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7917,6 +7993,29 @@ func (ec *executionContext) unmarshalInputUpdateUserPassword(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputValidateTokenInput(ctx context.Context, obj interface{}) (model.ValidateTokenInput, error) {
+	var it model.ValidateTokenInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "accessToken":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessToken"))
+			it.AccessToken, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -8050,6 +8149,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "refreshToken":
 			out.Values[i] = ec._Mutation_refreshToken(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "validateToken":
+			out.Values[i] = ec._Mutation_validateToken(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9450,6 +9554,11 @@ func (ec *executionContext) marshalNUser2ᚖgitlabᚗcomᚋtriveryᚑidᚋskadi�
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNValidateTokenInput2gitlabᚗcomᚋtriveryᚑidᚋskadiᚋgraphᚋmodelᚐValidateTokenInput(ctx context.Context, v interface{}) (model.ValidateTokenInput, error) {
+	res, err := ec.unmarshalInputValidateTokenInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
