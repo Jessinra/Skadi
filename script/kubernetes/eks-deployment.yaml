@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-skadi-linux-deployment
+  namespace: eks-skadi
+  labels:
+    app: eks-skadi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eks-skadi
+  template:
+    metadata:
+      labels:
+        app: eks-skadi
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+                - arm64
+      containers:
+      - name: skadi
+        image: trivery/skadi:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        - containerPort: 5000
+        imagePullPolicy: Always
+      nodeSelector:
+        kubernetes.io/os: linux
