@@ -7,8 +7,8 @@ COPY . ./
 ARG VERSION
 ENV VERSION=$VERSION
 
-RUN echo "building version $VERSION"
-RUN go build -o skadi
+RUN echo "building version $VERSION" &&\
+    go build -o skadi
 
 EXPOSE 5000
 
