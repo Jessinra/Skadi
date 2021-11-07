@@ -1,0 +1,1 @@
+kubectl rollout restart deployment.apps/eks-skadi -n eks-skadi
