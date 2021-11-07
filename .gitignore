@@ -20,4 +20,7 @@ utils/**/*.test
 # ignore test env values
 .env.test
 
+# ignore local scripts
+script/docker/**
+
 *.DS_Store
