@@ -1,6 +1,8 @@
 package dockertest_test
 
 import (
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,6 +10,10 @@ import (
 )
 
 func TestNewPostgreSQLPool_Integration(t *testing.T) {
+	if strings.EqualFold(os.Getenv("TEST_RUNNER"), "CircleCI") {
+		t.Skip("Skipping test: not supported on CircleCI")
+	}
+
 	t.Run("ok - successfully created docker pool with postgresql", func(t *testing.T) {
 		got, err := NewPostgreSQLPool()
 		defer func() {
