@@ -34,7 +34,9 @@ jobs:
   build: 
     machine: true
     environment:
-      SHORT_GIT_HASH: $(echo $CIRCLE_SHA1 | cut -c -7)
+      ENV: dev
+      GIN_MODE: debug
+      SILENT_GORM: "false"
     steps:
       - checkout
       - run: 
@@ -44,7 +46,13 @@ jobs:
           name: "docker build and push"
           command: |
             export SHORT_GIT_HASH=$(echo $CIRCLE_SHA1 | cut -c -7)
-            docker build -t trivery/skadi:$SHORT_GIT_HASH -t trivery/skadi:latest --build-arg VERSION=$SHORT_GIT_HASH .
+            docker build -t trivery/skadi:$SHORT_GIT_HASH -t trivery/skadi:latest \
+              --build-arg ENV=$ENV \
+              --build-arg VERSION=$SHORT_GIT_HASH \
+              --build-arg GIN_MODE=$GIN_MODE \
+              --build-arg SILENT_GORM=$SILENT_GORM \
+              --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+              --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY .
             docker push trivery/skadi
 
 workflows:
