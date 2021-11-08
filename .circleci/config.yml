@@ -59,25 +59,32 @@ jobs:
             docker push trivery/skadi
 
   deploy:
-    executor: aws-eks/python3
+    docker:
+      - image: amazon/aws-cli
     environment:
       AWS_REGION: ap-southeast-1
       NAMESPACE: eks-skadi
       CLUSTER_NAME: skadi
+      DEPLOYMENT_NAME: eks-skadi
     steps:
       - checkout
-      - aws-eks/update-kubeconfig-with-authenticator:
-          aws-region: $AWS_REGION
-          cluster-name: $CLUSTER_NAME
-          install-kubectl: true
-          dry-run: false
       - run:
-          name: Test cluster
-          command: kubectl get all -n $NAMESPACE
-      - kubernetes/create-or-update-resource:
-          get-rollout-status: true
-          resource-file-path: script/kubernetes/eks-deployment.yaml
-          resource-name: deployment/eks-skadi
+          name: Provision instance
+          command: |
+              sudo apt-get update -y
+              sudo curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.12/2020-11-02/bin/linux/amd64/kubectl
+              sudo chmod +x ./kubectl
+              mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+              echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+              aws configure set default.region $AWS_REGION
+              aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+              aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+              aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
+      - run:
+          name: Deploy to EKS
+          command: |
+              kubectl rollout restart deployment.apps/$DEPLOYMENT_NAME -n %NAMESPACE
+              kubectl rollout history deployment.apps/$DEPLOYMENT_NAME -n %NAMESPACE
 
 workflows:
   version: 2
@@ -90,13 +97,13 @@ workflows:
       #       - lint
       #       - test
       - deploy
-      - aws-eks/update-container-image:
-          aws-region: ap-southeast-1
-          namespace: eks-skadi
-          cluster-name: skadi
-          resource-name: deployment/eks-skadi
-          container-image-updates: 'skadi=trivery/skadi:latest'
-          get-rollout-status: true
-          show-kubectl-command: true
-          requires:
-            - deploy
+      # - aws-eks/update-container-image:
+      #     aws-region: ap-southeast-1
+      #     namespace: eks-skadi
+      #     cluster-name: skadi
+      #     resource-name: deployment/eks-skadi
+      #     container-image-updates: 'skadi=trivery/skadi:latest'
+      #     get-rollout-status: true
+      #     show-kubectl-command: true
+      #     requires:
+      #       - deploy
