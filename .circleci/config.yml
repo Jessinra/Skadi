@@ -82,6 +82,9 @@ jobs:
               aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
               aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
 
+              kubectl config view --minify
+              kubectl get svc
+
               kubectl rollout restart deployment.apps/$DEPLOYMENT_NAME -n $NAMESPACE
               kubectl rollout history deployment.apps/$DEPLOYMENT_NAME -n $NAMESPACE
 
