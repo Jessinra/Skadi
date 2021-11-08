@@ -77,7 +77,7 @@ jobs:
               export PATH=$PATH:$HOME/bin
               echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
       - run:
-          name: Setup Kubectl
+          name: Setup AWS CLI
           command: |
               export PATH=$PATH:$HOME/bin
               echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
@@ -87,7 +87,7 @@ jobs:
               aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
               aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
       - run:
-          name: Setup Kubectl
+          name: Deploy to EKS
           command: |
               export PATH=$PATH:$HOME/bin
               echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
