@@ -57,31 +57,23 @@ jobs:
               --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY .
             docker push trivery/skadi
 
-  # deploy:
-  #   executor: aws-eks/python3
-  #   environment:
-  #     NAMESPACE: eks-skadi
-  #     CLUSTER_NAME: skadi
-  #   steps:
-  #     - checkout
-  #     # - kubernetes/install
-  #     - aws-eks/update-kubeconfig-with-authenticator:
-  #         cluster-name: $CLUSTER_NAME
-  #         install-kubectl: true
-  #     - run:
-  #         name: Test cluster
-  #         command: kubectl get all -n $NAMESPACE
-  #     # - kubernetes/create-or-update-resource:
-  #     #     get-rollout-status: true
-  #     #     resource-file-path: tests/nginx-deployment/deployment.yaml
-  #     #     resource-name: deployment/nginx-deployment
-  #     - aws-eks/update-container-image:
-  #         cluster-name: $CLUSTER_NAME
-  #         container-image-updates: 'skadi=trivery/skadi:latest'
-  #         record: true
-  #         requires:
-  #           - create-deployment
-  #         resource-name: deployment/nginx-deployment
+  deploy:
+    executor: aws-eks/python3
+    environment:
+      NAMESPACE: eks-skadi
+      CLUSTER_NAME: skadi
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: $CLUSTER_NAME
+          install-kubectl: true
+      - run:
+          name: Test cluster
+          command: kubectl get all -n $NAMESPACE
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: script/kubernetes/eks-deployment.yaml
+          resource-name: deployment/eks-skadi
 
 workflows:
   version: 2
@@ -93,6 +85,7 @@ workflows:
       #     requires:
       #       - lint
       #       - test
+      - deploy
       - aws-eks/update-container-image:
           aws-region: ap-southeast-1
           namespace: eks-skadi
@@ -101,5 +94,5 @@ workflows:
           container-image-updates: 'skadi=trivery/skadi:latest'
           get-rollout-status: true
           show-kubectl-command: true
-          # requires:
-          #   - build
+          requires:
+            - deploy
