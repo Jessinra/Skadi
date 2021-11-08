@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  aws-eks: circleci/aws-eks@1.1.0
 jobs:
   lint:
     docker:
@@ -55,13 +57,49 @@ jobs:
               --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY .
             docker push trivery/skadi
 
+  # deploy:
+  #   executor: aws-eks/python3
+  #   environment:
+  #     NAMESPACE: eks-skadi
+  #     CLUSTER_NAME: skadi
+  #   steps:
+  #     - checkout
+  #     # - kubernetes/install
+  #     - aws-eks/update-kubeconfig-with-authenticator:
+  #         cluster-name: $CLUSTER_NAME
+  #         install-kubectl: true
+  #     - run:
+  #         name: Test cluster
+  #         command: kubectl get all -n $NAMESPACE
+  #     # - kubernetes/create-or-update-resource:
+  #     #     get-rollout-status: true
+  #     #     resource-file-path: tests/nginx-deployment/deployment.yaml
+  #     #     resource-name: deployment/nginx-deployment
+  #     - aws-eks/update-container-image:
+  #         cluster-name: $CLUSTER_NAME
+  #         container-image-updates: 'skadi=trivery/skadi:latest'
+  #         record: true
+  #         requires:
+  #           - create-deployment
+  #         resource-name: deployment/nginx-deployment
+
 workflows:
   version: 2
   build-workflow:
     jobs:
-      - lint
-      - test
-      - build:
-          requires:
-            - lint
-            - test
+      # - lint
+      # - test
+      # - build:
+      #     requires:
+      #       - lint
+      #       - test
+      - aws-eks/update-container-image:
+          aws-region: ap-southeast-1
+          namespace: eks-skadi
+          cluster-name: skadi
+          resource-name: deployment/eks-skadi
+          container-image-updates: 'skadi=trivery/skadi:latest'
+          get-rollout-status: true
+          show-kubectl-command: true
+          # requires:
+          #   - build
