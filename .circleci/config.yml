@@ -83,6 +83,7 @@ jobs:
               aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
 
               kubectl config view --minify
+              kubectl config current-context
               kubectl get svc
 
               kubectl rollout restart deployment.apps/$DEPLOYMENT_NAME -n $NAMESPACE
