@@ -61,13 +61,16 @@ jobs:
   deploy:
     executor: aws-eks/python3
     environment:
+      AWS_REGION: ap-southeast-1
       NAMESPACE: eks-skadi
       CLUSTER_NAME: skadi
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
+          aws-region: $AWS_REGION
           cluster-name: $CLUSTER_NAME
           install-kubectl: true
+          dry-run: false
       - run:
           name: Test cluster
           command: kubectl get all -n $NAMESPACE
