@@ -25,7 +25,12 @@ func (svc *UserService) Login(ctx context.Context, in LoginInput) (*GenerateAuth
 		return nil, errUnauthorized
 	}
 
-	return svc.GenerateAuthTokens(ctx, user.ID)
+	token, err := svc.GenerateAuthTokens(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
 }
 
 func (svc *UserService) RefreshToken(ctx context.Context, in RefreshTokenInput) (*GenerateAuthTokensOutput, error) {
