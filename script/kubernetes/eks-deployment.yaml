@@ -29,8 +29,6 @@ spec:
       - name: skadi
         image: trivery/skadi:latest
         ports:
-        - containerPort: 80
-        - containerPort: 443
         - containerPort: 5000
         imagePullPolicy: Always
       nodeSelector:
