@@ -99,20 +99,16 @@ workflows:
   version: 2
   build-workflow:
     jobs:
-      # - lint
-      # - test
-      # - build:
-      #     requires:
-      #       - lint
-      #       - test
-      - deploy
-      # - aws-eks/update-container-image:
-      #     aws-region: ap-southeast-1
-      #     namespace: eks-skadi
-      #     cluster-name: skadi
-      #     resource-name: deployment/eks-skadi
-      #     container-image-updates: 'skadi=trivery/skadi:latest'
-      #     get-rollout-status: true
-      #     show-kubectl-command: true
-      #     requires:
-      #       - deploy
+      - lint
+      - test
+      - build:
+          requires:
+            - lint
+            - test
+      - deploy:
+          branches:
+            only:
+              - master
+              - cicd-kubernetes
+          requires:
+            - build
