@@ -106,9 +106,10 @@ workflows:
             - lint
             - test
       - deploy:
-          branches:
-            only:
-              - master
-              - cicd-kubernetes
           requires:
             - build
+          filters:
+            branches:
+              only:
+                - master
+                - cicd-kubernetes
