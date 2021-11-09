@@ -1,0 +1,55 @@
+Description: >
+    Create a kubernetes cluster on AWS EKS.
+
+Parameters:
+    ClusterName:
+        Description: A name that will be used as cluster name
+        Type: String
+    ClusterRoleARN:
+        Description: ARN of cluster role
+        Type: String
+    ClusterSecurityGroup:
+        Description: ARN of cluster role
+        Type: String
+    ClusterPublicSubnet1:
+        Description: ARN of cluster role
+        Type: String
+    ClusterPublicSubnet2:
+        Description: ARN of cluster role
+        Type: String
+  
+Resources:
+    Cluster: 
+        Type: AWS::EKS::Cluster
+        Properties: 
+            Name: !Ref ClusterName
+            RoleArn: !Ref ClusterRoleARN
+            ResourcesVpcConfig: 
+                SecurityGroupIds: 
+                  - !Ref ClusterSecurityGroup
+                  - sg-054274cf8e545fcea
+                SubnetIds: 
+                  - !Ref ClusterPublicSubnet1
+                  - !Ref ClusterPublicSubnet2
+    # vpcCNI:
+    #     Type: AWS::EKS::Addon
+    #     DependsOn: Cluster
+    #     Properties: 
+    #       AddonName: vpc-cni
+    #       AddonVersion: v1.9.3-eksbuild.1
+    #       ClusterName: !Ref ClusterName
+    #       ResolveConflicts: OVERWRITE
+    coreDNS:
+        Type: AWS::EKS::Addon
+        DependsOn: Cluster
+        Properties: 
+          AddonName: coredns
+          AddonVersion: v1.8.4-eksbuild.1
+          ClusterName: !Ref ClusterName
+    kubeProxy:
+        Type: AWS::EKS::Addon
+        DependsOn: Cluster
+        Properties: 
+          AddonName: kube-proxy
+          AddonVersion: v1.21.2-eksbuild.2
+          ClusterName: !Ref ClusterName

@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "skadi"
+  },
+  {
+    "ParameterKey": "ClusterRoleARN",
+    "ParameterValue": "arn:aws:iam::442662599070:role/eksClusterRole"
+  },
+  {
+    "ParameterKey": "ClusterSecurityGroup",
+    "ParameterValue": "sg-054274cf8e545fcea"
+  },
+  {
+    "ParameterKey": "ClusterPublicSubnet1",
+    "ParameterValue": "subnet-03f56858191e9fab9"
+  },
+  {
+    "ParameterKey": "ClusterPublicSubnet2",
+    "ParameterValue": "subnet-0b450a9b4426de827"
+  }
+]
